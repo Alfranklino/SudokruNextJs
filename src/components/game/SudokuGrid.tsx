@@ -5,6 +5,7 @@ import { useState, useCallback, memo, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { GAME_CONFIG } from '@/lib/constants';
 import { NumberSelector } from './NumberSelector';
+import { CandidateNumbers } from './CandidateNumbers';
 import { useCellFloatingPosition } from '@/hooks/useFloatingPosition';
 
 interface SudokuGridProps {
@@ -25,6 +26,7 @@ interface CellProps {
   isError: boolean;
   isHighlighted: boolean;
   isSelected: boolean;
+  candidates: Set<number>;
   onChange: (value: number) => void;
   onSelect: () => void;
   readOnly: boolean;
@@ -38,6 +40,7 @@ const SudokuCell = memo(({
   isError,
   isHighlighted,
   isSelected,
+  candidates,
   onChange,
   onSelect,
   readOnly,
@@ -94,7 +97,15 @@ const SudokuCell = memo(({
       data-col={col}
       aria-label={`Cell at row ${row + 1}, column ${col + 1}${value ? `, value ${value}` : ', empty'}`}
     >
-      {value !== 0 ? value : ''}
+      {value !== 0 ? (
+        <span className="relative z-10">{value}</span>
+      ) : (
+        <CandidateNumbers
+          candidates={candidates}
+          cellSize="medium"
+          className="absolute inset-0"
+        />
+      )}
     </button>
   );
 });
@@ -154,6 +165,29 @@ export const SudokuGrid = memo(({
     setSelectedCell(null);
   }, []);
 
+  const handleCandidateToggle = useCallback((number: number) => {
+    if (selectedCell && !readOnly) {
+      const key = getCellKey(selectedCell.row, selectedCell.col);
+      const currentCandidates = candidateNumbers.get(key) || new Set();
+      const newCandidates = new Set(currentCandidates);
+
+      if (newCandidates.has(number)) {
+        newCandidates.delete(number);
+      } else {
+        newCandidates.add(number);
+      }
+
+      const newCandidateNumbers = new Map(candidateNumbers);
+      if (newCandidates.size === 0) {
+        newCandidateNumbers.delete(key);
+      } else {
+        newCandidateNumbers.set(key, newCandidates);
+      }
+
+      setCandidateNumbers(newCandidateNumbers);
+    }
+  }, [selectedCell, readOnly, candidateNumbers]);
+
   const getCellKey = (row: number, col: number) => `${row}-${col}`;
 
   const getCandidatesForCell = (row: number, col: number) => {
@@ -199,6 +233,7 @@ export const SudokuGrid = memo(({
                 isError={hasError}
                 isHighlighted={isHighlighted}
                 isSelected={isSelected}
+                candidates={getCandidatesForCell(rowIndex, colIndex)}
                 onChange={(value) => handleCellChange(rowIndex, colIndex, value)}
                 onSelect={() => handleCellSelect(rowIndex, colIndex)}
                 readOnly={readOnly}
@@ -257,6 +292,7 @@ export const SudokuGrid = memo(({
       onNumberSelect={handleNumberSelect}
       onClear={handleClear}
       onClose={handleCloseNumberSelector}
+      onCandidateToggle={handleCandidateToggle}
     />
   </>
   );

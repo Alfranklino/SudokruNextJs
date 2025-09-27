@@ -16,6 +16,7 @@ interface NumberSelectorProps {
   onNumberSelect: (number: number) => void;
   onClear: () => void;
   onClose: () => void;
+  onCandidateToggle?: (number: number) => void;
   className?: string;
 }
 
@@ -30,6 +31,7 @@ export const NumberSelector = ({
   onNumberSelect,
   onClear,
   onClose,
+  onCandidateToggle,
   className
 }: NumberSelectorProps) => {
   const [mode, setMode] = useState<SelectionMode>('number');
@@ -59,7 +61,8 @@ export const NumberSelector = ({
         newCandidates.add(number);
       }
       setLocalCandidates(newCandidates);
-      // In a real implementation, this would call a candidate update function
+      // Call the candidate update function
+      onCandidateToggle?.(number);
     }
   };
 
