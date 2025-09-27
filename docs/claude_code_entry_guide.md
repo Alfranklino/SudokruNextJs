@@ -1,0 +1,193 @@
+# Claude Code Development Guide
+
+## Project Overview
+This project follows a **frontend-first prototyping approach** using Next.js 14+, TypeScript, and a structured documentation system. This guide tells you how to use each document to build the application systematically.
+
+## Tech Stack
+- **Frontend**: Next.js 14+ with TypeScript
+- **Development DB**: SQLite with Prisma ORM
+- **Production DB**: PostgreSQL
+- **UI**: Tailwind CSS + shadcn/ui
+- **State Management**: Zustand
+
+## Development Phases & Document Usage
+
+### Phase 1: Frontend Shell & Components
+**Goal**: Create interactive UI with mock data
+
+**Primary Documents to Use:**
+1. **Figma Design System** → Use for exact UI specifications and component designs
+2. **Component Library Documentation** → Follow for shadcn/ui setup and custom component creation
+3. **Frontend Architecture Document** → Use for project structure, routing, and state management setup
+4. **Project Folder Structure Document** → Follow for organizing files and folders
+5. **Wireframes/Low-Fi Mockups** → Reference for layout structure and user flow
+
+**MCPs to Use:**
+- File System MCP: Create project structure and component files
+- Package Manager MCP: Install Next.js, TypeScript, Tailwind, shadcn/ui, Zustand
+
+**Key Actions:**
+1. Set up Next.js project with TypeScript
+2. Configure Tailwind CSS and install shadcn/ui components
+3. Create component library based on design system
+4. Build all major pages with mock data
+5. Implement navigation and basic routing
+6. Add Zustand for state management with mock data
+
+### Phase 2: API Layer Development
+**Goal**: Add API structure with mock responses
+
+**Primary Documents to Use:**
+1. **API Specification (OpenAPI/Swagger)** → Implement exact endpoints with mock data
+2. **Data Flow Diagrams** → Understand data movement between components and API
+3. **User Journey Maps** → Ensure API supports all user flows
+4. **Error Handling & Logging Standards** → Implement proper error responses
+
+**MCPs to Use:**
+- File System MCP: Create API route files in `/pages/api` or `/app/api`
+
+**Key Actions:**
+1. Create Next.js API routes matching the OpenAPI specification
+2. Return structured mock data from all endpoints
+3. Integrate frontend with real API calls (using SWR or React Query)
+4. Add loading states and error boundaries
+5. Implement form validation and submission
+
+### Phase 3: Database Integration
+**Goal**: Replace mock data with real database
+
+**Primary Documents to Use:**
+1. **Database Schema Documentation** → Use the complete Prisma schema provided
+2. **Environment Configuration Guide** → Set up database connections and environment variables
+3. **PRD (Product Requirements Document)** → Validate business logic implementation
+4. **Technical Requirements Document (TRD)** → Follow architecture decisions
+
+**MCPs to Use:**
+- Database MCP: Execute schema, run migrations, seed data
+- File System MCP: Create Prisma configuration files
+
+**Key Actions:**
+1. Copy the complete Prisma schema from documentation
+2. Set up SQLite for development using provided commands
+3. Run migrations and seed initial data
+4. Replace API mock responses with real database queries
+5. Implement full CRUD operations
+6. Add data validation using provided schemas
+
+### Phase 4: Authentication & Security
+**Goal**: Add user management and security
+
+**Primary Documents to Use:**
+1. **Authentication & Authorization Schema** → Implement user roles and permissions
+2. **Security Guidelines** → Follow security best practices
+3. **Performance Requirements & Monitoring** → Implement monitoring
+
+**MCPs to Use:**
+- Package Manager MCP: Install auth libraries (NextAuth.js, etc.)
+- Database MCP: Update schema with auth tables
+
+**Key Actions:**
+1. Implement authentication system following the schema
+2. Add role-based access control
+3. Implement session management
+4. Add security headers and CORS policies
+5. Set up input validation and sanitization
+
+### Phase 5: Production Preparation
+**Goal**: Deploy production-ready application
+
+**Primary Documents to Use:**
+1. **CI/CD Pipeline Documentation** → Set up deployment workflow
+2. **Environment Configuration Guide** → Configure production environment
+3. **MVP Feature Matrix** → Validate all core features are complete
+
+**MCPs to Use:**
+- Git MCP: Version control and deployment preparation
+- Database MCP: Migrate to PostgreSQL
+
+**Key Actions:**
+1. Migrate from SQLite to PostgreSQL
+2. Set up production environment variables
+3. Configure CI/CD pipeline
+4. Implement monitoring and logging
+5. Performance optimization and testing
+
+## Document Reference Quick Guide
+
+### Planning Documents (Use Throughout)
+- **PRD** → Feature specifications and business logic
+- **TRD** → Technical architecture decisions
+- **MVP Feature Matrix** → Core vs. nice-to-have features
+- **Prototyping Roadmap Document** → Development phase guidance
+
+### Implementation Documents (Use Per Phase)
+- **Database Schema** → Ready-to-use Prisma schema with step-by-step implementation
+- **API Specification** → Exact endpoint definitions with request/response schemas
+- **Component Library** → UI component specifications and usage guidelines
+- **Project Folder Structure** → File organization and naming conventions
+
+### Configuration Documents (Use When Needed)
+- **Environment Configuration** → Environment variables and setup instructions
+- **Security Guidelines** → Security implementation requirements
+- **Error Handling Standards** → Error codes and logging procedures
+- **Performance Requirements** → Optimization targets and monitoring setup
+
+## Getting Started: READ THIS FIRST
+
+**STEP 1: Project Understanding (MANDATORY)**
+- [ ] **Read the PRD (Product Requirements Document) FIRST** - This is critical to understand what you're building, the target users, core features, and business logic
+- [ ] Review the MVP Feature Matrix to prioritize features
+- [ ] Read the User Journey Maps to understand user flows
+- [ ] Check the Prototyping Roadmap to understand the development approach
+
+**STEP 2: Architecture Planning**
+- [ ] Read the TRD (Technical Requirements Document) for architecture decisions
+- [ ] Review the Database Schema Documentation to understand data structure
+- [ ] Check the API Specification to understand system interfaces
+
+**Only proceed to Phase 1 after completing Steps 1 and 2.**
+
+## Development Phase Checklist
+
+**Phase 1 Setup:**
+- [ ] Use Project Folder Structure to create directory organization
+- [ ] Follow Frontend Architecture Document for Next.js setup
+- [ ] Install dependencies using Package Manager MCP
+- [ ] Set up Tailwind CSS and shadcn/ui per Component Library Documentation
+
+**Quality Assurance:**
+- [ ] Each phase should result in a working, demonstrable application
+- [ ] Validate against User Journey Maps after each phase
+- [ ] Follow Error Handling Standards for consistent error management
+- [ ] Check Performance Requirements during development
+
+## MCP Usage Patterns
+
+**File System MCP**: Use for creating project structure, component files, configuration files
+**Database MCP**: Use for schema management, migrations, queries
+**Git MCP**: Use for version control throughout development
+**Package Manager MCP**: Use for dependency installation and management
+
+## Troubleshooting
+
+**If documentation is unclear:**
+- Check the specific document's troubleshooting section
+- Refer to the TRD for architectural context
+- Cross-reference with related documents
+
+**If implementation fails:**
+- Verify environment configuration using the Environment Configuration Guide
+- Check database setup using Database Schema Documentation
+- Validate API contracts using API Specification
+
+## Success Criteria
+
+**Phase 1**: All user interfaces working with mock data
+**Phase 2**: API endpoints functional with proper error handling
+**Phase 3**: Database persistence working correctly
+**Phase 4**: Secure authentication and authorization implemented
+**Phase 5**: Production deployment successful
+
+---
+
+**Remember**: This is a frontend-first approach. Each phase builds on the previous one, ensuring you always have a working, demonstrable application. Focus on completing one phase fully before moving to the next.
