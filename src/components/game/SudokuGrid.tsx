@@ -65,7 +65,7 @@ const SudokuCell = memo(({
   };
 
   const handleClick = () => {
-    if (!readOnly) {
+    if (!readOnly && !isInitial) {
       onSelect();
     }
   };
@@ -75,7 +75,8 @@ const SudokuCell = memo(({
       className={cn(
         'w-10 h-10 border border-gray-300 flex items-center justify-center text-lg font-semibold transition-all duration-200',
         'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10',
-        'hover:bg-gray-50 relative',
+        'relative',
+        !isInitial && !readOnly && 'hover:bg-gray-50',
         'md:w-12 md:h-12 md:text-xl', // Larger on desktop
         {
           'bg-gray-100 text-gray-800 cursor-default font-bold': isInitial,
@@ -91,8 +92,8 @@ const SudokuCell = memo(({
       )}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      disabled={readOnly}
-      tabIndex={readOnly ? -1 : 0}
+      disabled={readOnly || isInitial}
+      tabIndex={readOnly || isInitial ? -1 : 0}
       data-row={row}
       data-col={col}
       aria-label={`Cell at row ${row + 1}, column ${col + 1}${value ? `, value ${value}` : ', empty'}`}
@@ -136,11 +137,17 @@ export const SudokuGrid = memo(({
   );
 
   const handleCellSelect = useCallback((row: number, col: number) => {
+    // Prevent selection of initial/fixed cells
+    const isInitialCell = initialGrid[row][col] !== 0;
+    if (isInitialCell) {
+      return;
+    }
+
     const newCell = { row, col };
     setSelectedCell(newCell);
     setShowNumberSelector(true);
     onCellSelect?.(row, col);
-  }, [onCellSelect]);
+  }, [onCellSelect, initialGrid]);
 
   const handleCellChange = useCallback((row: number, col: number, value: number) => {
     onCellChange?.(row, col, value);
