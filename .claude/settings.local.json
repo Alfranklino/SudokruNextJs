@@ -12,7 +12,13 @@
       "Bash(git init:*)",
       "Bash(git remote add:*)",
       "Bash(git branch:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\n🎉 Initial Sudokru Frontend Implementation\n\n✨ Phase 1: Frontend Shell & Components Complete\n\n🚀 Features:\n- Next.js 15.5.4 with TypeScript and App Router\n- Tailwind CSS v4 + shadcn/ui component library\n- Complete Zustand state management (auth, game, UI)\n- Interactive Sudoku grid with real-time updates\n- Game status tracking and player management\n- Responsive design with mobile support\n- Comprehensive type definitions\n- Mock data for frontend prototyping\n\n🛠️ Tech Stack:\n- Next.js 15.5.4 (Turbopack)\n- TypeScript 5+\n- Tailwind CSS v4\n- shadcn/ui components\n- Zustand state management\n- React Hook Form + Zod\n- Lucide React icons\n- Prisma (ready for integration)\n- Socket.io client (ready for real-time)\n\n📁 Architecture:\n- Frontend-first prototyping approach\n- Component-driven development\n- Type-safe API layer preparation\n- Scalable folder structure\n- Documented development patterns\n\n🎮 Demo:\n- Interactive landing page\n- Live Sudoku game demonstration\n- Real-time player status\n- Game chat mockup\n- Tournament features preview\n\n🔧 Development:\n- Fixed React hydration issues\n- Proper metadata configuration\n- Clean compilation with Turbopack\n- Ready for Phase 2 development\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(git config:*)",
+      "Bash(git checkout:*)",
+      "Bash(git commit:*)",
+      "Bash(git merge:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,9 +1,11 @@
 // SudokuGrid component following the documented design
 'use client';
 
-import { useState, useCallback, memo } from 'react';
+import { useState, useCallback, memo, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { GAME_CONFIG } from '@/lib/constants';
+import { NumberSelector } from './NumberSelector';
+import { useCellFloatingPosition } from '@/hooks/useFloatingPosition';
 
 interface SudokuGridProps {
   initialGrid: number[][];
@@ -88,6 +90,8 @@ const SudokuCell = memo(({
       onKeyDown={handleKeyDown}
       disabled={readOnly}
       tabIndex={readOnly ? -1 : 0}
+      data-row={row}
+      data-col={col}
       aria-label={`Cell at row ${row + 1}, column ${col + 1}${value ? `, value ${value}` : ', empty'}`}
     >
       {value !== 0 ? value : ''}
@@ -109,15 +113,53 @@ export const SudokuGrid = memo(({
   className
 }: SudokuGridProps) => {
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null);
+  const [showNumberSelector, setShowNumberSelector] = useState(false);
+  const [candidateNumbers, setCandidateNumbers] = useState<Map<string, Set<number>>>(new Map());
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  // Calculate position for the floating number selector
+  const selectorPosition = useCellFloatingPosition(
+    selectedCell?.row ?? null,
+    selectedCell?.col ?? null,
+    gridRef.current
+  );
 
   const handleCellSelect = useCallback((row: number, col: number) => {
-    setSelectedCell({ row, col });
+    const newCell = { row, col };
+    setSelectedCell(newCell);
+    setShowNumberSelector(true);
     onCellSelect?.(row, col);
   }, [onCellSelect]);
 
   const handleCellChange = useCallback((row: number, col: number, value: number) => {
     onCellChange?.(row, col, value);
   }, [onCellChange]);
+
+  const handleNumberSelect = useCallback((number: number) => {
+    if (selectedCell && !readOnly) {
+      handleCellChange(selectedCell.row, selectedCell.col, number);
+      setShowNumberSelector(false);
+    }
+  }, [selectedCell, readOnly, handleCellChange]);
+
+  const handleClear = useCallback(() => {
+    if (selectedCell && !readOnly) {
+      handleCellChange(selectedCell.row, selectedCell.col, 0);
+      setShowNumberSelector(false);
+    }
+  }, [selectedCell, readOnly, handleCellChange]);
+
+  const handleCloseNumberSelector = useCallback(() => {
+    setShowNumberSelector(false);
+    setSelectedCell(null);
+  }, []);
+
+  const getCellKey = (row: number, col: number) => `${row}-${col}`;
+
+  const getCandidatesForCell = (row: number, col: number) => {
+    const key = getCellKey(row, col);
+    return candidateNumbers.get(key) || new Set();
+  };
 
   const isError = (row: number, col: number, value: number): boolean => {
     if (!showErrors || !solution || value === 0) return false;
@@ -135,12 +177,13 @@ export const SudokuGrid = memo(({
   }
 
   return (
-    <div className={cn('inline-block bg-gray-800 p-1 rounded-lg shadow-lg', className)}>
-      <div
-        className="grid grid-cols-9 gap-0 bg-white rounded"
-        role="grid"
-        aria-label="Sudoku puzzle grid"
-      >
+    <>
+      <div className={cn('inline-block bg-gray-800 p-1 rounded-lg shadow-lg', className)} ref={gridRef}>
+        <div
+          className="grid grid-cols-9 gap-0 bg-white rounded"
+          role="grid"
+          aria-label="Sudoku puzzle grid"
+        >
         {currentGrid.map((row, rowIndex) =>
           row.map((cellValue, colIndex) => {
             const isInitial = initialGrid[rowIndex][colIndex] !== 0;
@@ -184,7 +227,38 @@ export const SudokuGrid = memo(({
           </button>
         ))}
       </div>
+
+      {/* Number input helpers for mobile */}
+      <div className="mt-4 grid grid-cols-9 gap-1 md:hidden">
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+          <button
+            key={num}
+            className="w-8 h-8 bg-gray-100 border border-gray-300 rounded text-sm font-medium hover:bg-gray-200 transition-colors"
+            onClick={() => {
+              if (selectedCell && !readOnly) {
+                handleCellChange(selectedCell.row, selectedCell.col, num);
+              }
+            }}
+            disabled={!selectedCell || readOnly}
+          >
+            {num}
+          </button>
+        ))}
+      </div>
     </div>
+
+    {/* Floating Number Selector Widget */}
+    <NumberSelector
+      isVisible={showNumberSelector && !readOnly}
+      position={selectorPosition}
+      selectedCell={selectedCell}
+      currentValue={selectedCell ? currentGrid[selectedCell.row]?.[selectedCell.col] : undefined}
+      candidateNumbers={selectedCell ? getCandidatesForCell(selectedCell.row, selectedCell.col) : new Set()}
+      onNumberSelect={handleNumberSelect}
+      onClear={handleClear}
+      onClose={handleCloseNumberSelector}
+    />
+  </>
   );
 });
 
