@@ -12,9 +12,7 @@ import {
   Plus,
   Eye,
   BarChart3,
-  Zap,
   Star,
-  Award,
   Timer,
   Flame,
   Gamepad2,
@@ -598,34 +596,52 @@ export default function DashboardPage() {
               <div className="bg-white rounded-xl p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-blue-600" />
+                    <BarChart3 className="w-4 h-4 text-slate-600" />
                     <h2 className="text-lg font-semibold text-slate-900">Your Statistics</h2>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-blue-600">
-                    📊
-                  </Button>
+                  <div className="w-4 h-4 text-slate-400">
+                    <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4">
+                      <path fillRule="evenodd" d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 1 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z" />
+                    </svg>
+                  </div>
                 </div>
 
                 {/* Current Rating */}
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-slate-600">Current Rating</span>
-                    <span className="text-lg font-bold text-purple-600">+24</span>
+                    <span className="text-sm font-medium text-slate-900">Current Rating</span>
+                    <span className="text-sm font-bold text-green-600">+24</span>
                   </div>
-                  <div className="text-2xl font-bold text-slate-900 mb-1">2156</div>
+                  <div className="text-3xl font-bold text-blue-600 mb-1">2156</div>
                   <div className="text-xs text-slate-500">This week</div>
                 </div>
 
-                {/* Weekly Chart */}
+                {/* Weekly Chart - Line Chart */}
                 <div className="mb-6">
-                  <div className="h-20 bg-slate-50 rounded-lg flex items-end justify-center px-2 py-2 mb-2">
-                    <div className="flex items-end gap-1 w-full">
-                      {[65, 70, 45, 80, 60, 85, 75].map((height, i) => (
-                        <div key={i} className="flex-1 bg-blue-500 rounded-t-sm" style={{ height: `${height}%` }}></div>
+                  <div className="h-24 bg-slate-50 rounded-lg relative px-4 py-3 mb-2">
+                    <svg className="w-full h-full" viewBox="0 0 280 80">
+                      {/* Chart line */}
+                      <polyline
+                        fill="none"
+                        stroke="#3B82F6"
+                        strokeWidth="2"
+                        points="20,60 60,45 100,65 140,35 180,50 220,25 260,40"
+                      />
+                      {/* Data points */}
+                      {[
+                        { x: 20, y: 60 },
+                        { x: 60, y: 45 },
+                        { x: 100, y: 65 },
+                        { x: 140, y: 35 },
+                        { x: 180, y: 50 },
+                        { x: 220, y: 25 },
+                        { x: 260, y: 40 }
+                      ].map((point, i) => (
+                        <circle key={i} cx={point.x} cy={point.y} r="3" fill="#3B82F6" />
                       ))}
-                    </div>
+                    </svg>
                   </div>
-                  <div className="flex justify-between text-xs text-slate-400">
+                  <div className="flex justify-between text-xs text-slate-400 px-2">
                     <span>Tue</span>
                     <span>Wed</span>
                     <span>Thu</span>
@@ -637,33 +653,33 @@ export default function DashboardPage() {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 mb-1">
-                      <TrendingUp className="w-4 h-4 text-green-600" />
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                       <span className="text-lg font-bold text-green-600">87.3%</span>
                     </div>
-                    <div className="text-xs text-slate-500">Win Rate</div>
+                    <div className="text-sm text-slate-500">Win Rate</div>
                   </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 mb-1">
-                      <Trophy className="w-4 h-4 text-purple-600" />
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                       <span className="text-lg font-bold text-purple-600">#42</span>
                     </div>
-                    <div className="text-xs text-slate-500">Global Rank</div>
+                    <div className="text-sm text-slate-500">Global Rank</div>
                   </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 mb-1">
-                      <Clock className="w-4 h-4 text-blue-600" />
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                       <span className="text-lg font-bold text-blue-600">8:45</span>
                     </div>
-                    <div className="text-xs text-slate-500">Avg Time</div>
+                    <div className="text-sm text-slate-500">Avg Time</div>
                   </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 mb-1">
-                      <Flame className="w-4 h-4 text-orange-600" />
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                       <span className="text-lg font-bold text-orange-600">12</span>
                     </div>
-                    <div className="text-xs text-slate-500">Win Streak</div>
+                    <div className="text-sm text-slate-500">Win Streak</div>
                   </div>
                 </div>
 
@@ -673,14 +689,11 @@ export default function DashboardPage() {
                   <div className="space-y-4">
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <Zap className="w-4 h-4 text-blue-600" />
-                          <div>
-                            <div className="text-sm font-medium">Speed Contest</div>
-                            <div className="text-xs text-slate-500">Complete 50 games under 5 minutes</div>
-                          </div>
+                        <div>
+                          <div className="text-sm font-medium text-slate-900">Speed Demon</div>
+                          <div className="text-xs text-slate-500">Complete 50 games under 5 minutes</div>
                         </div>
-                        <Badge variant="outline" className="text-xs">34/50</Badge>
+                        <Badge variant="outline" className="text-xs font-medium">34/50</Badge>
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-2">
                         <div className="bg-blue-500 h-2 rounded-full" style={{ width: '68%' }}></div>
@@ -688,14 +701,11 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <Star className="w-4 h-4 text-blue-600" />
-                          <div>
-                            <div className="text-sm font-medium">Perfectionist</div>
-                            <div className="text-xs text-slate-500">Win 10 tournaments</div>
-                          </div>
+                        <div>
+                          <div className="text-sm font-medium text-slate-900">Perfectionist</div>
+                          <div className="text-xs text-slate-500">Complete games without errors</div>
                         </div>
-                        <Badge variant="outline" className="text-xs">156/200</Badge>
+                        <Badge variant="outline" className="text-xs font-medium">156/200</Badge>
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-2">
                         <div className="bg-blue-500 h-2 rounded-full" style={{ width: '78%' }}></div>
@@ -703,17 +713,40 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <Award className="w-4 h-4 text-blue-600" />
-                          <div>
-                            <div className="text-sm font-medium">Multitasking Champion</div>
-                            <div className="text-xs text-slate-500">Win 10 tournaments</div>
-                          </div>
+                        <div>
+                          <div className="text-sm font-medium text-slate-900">Tournament Champion</div>
+                          <div className="text-xs text-slate-500">Win 10 tournaments</div>
                         </div>
-                        <Badge variant="outline" className="text-xs">7/10</Badge>
+                        <Badge variant="outline" className="text-xs font-medium">7/10</Badge>
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-2">
                         <div className="bg-blue-500 h-2 rounded-full" style={{ width: '70%' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom Statistics */}
+                <div className="mb-6">
+                  <div className="grid grid-cols-2 gap-6 text-sm">
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Games this week:</span>
+                        <span className="font-medium text-slate-900">23</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Perfect games:</span>
+                        <span className="font-medium text-slate-900">156</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Total playtime:</span>
+                        <span className="font-medium text-slate-900">142h 25m</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Rapid (10 min):</span>
+                        <span className="font-medium text-slate-900">Rapid (10 min)</span>
                       </div>
                     </div>
                   </div>
