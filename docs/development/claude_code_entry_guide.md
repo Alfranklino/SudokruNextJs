@@ -12,6 +12,30 @@ This project follows a **frontend-first prototyping approach** using Next.js 14+
 
 ## Development Phases & Document Usage
 
+### Phase 0: Git and GitHub Setup
+**Goal**: Initialize version control and remote repository
+
+**Primary Document to Use:**
+1. **git_guidelines.md** → Complete Git workflow and branching strategy
+
+**Key Actions:**
+1. Initialize Git repository locally
+2. Create remote GitHub repository
+3. Create `main` branch
+4. Create `dev` branch and set as default on GitHub
+5. Create initial commit with professional README.md
+6. Never commit directly to `dev` or `main` - always use feature branches
+7. Follow branch naming conventions: `feat/`, `fix/`, `experimental/`
+8. Never push, merge, or create PR without explicit permission
+
+**Success Criteria:**
+- Repository initialized with proper branch structure
+- README.md created and committed
+- Files in /docs directory organized in the following categories (each category being a subfolder): development, planning, design, technical, user-experience, infrastructure. Documentation Files must be moved to their appropriate directory.
+- A second README.md file added into the /docs directory to help understand the purpose of the docs.
+- Remote repository configured
+- Git workflow understood
+
 ### Phase 1: Frontend Shell & Components
 **Goal**: Create interactive UI with mock data
 
@@ -145,9 +169,16 @@ This project follows a **frontend-first prototyping approach** using Next.js 14+
 - [ ] Review the Database Schema Documentation to understand data structure
 - [ ] Check the API Specification to understand system interfaces
 
-**Only proceed to Phase 1 after completing Steps 1 and 2.**
+**Only proceed to Phase 0 (Git setup) after completing Steps 1 and 2.**
 
 ## Development Phase Checklist
+
+**Phase 0 Setup:**
+- [ ] Follow git_guidelines.md exactly for repository setup
+- [ ] Create main and dev branches
+- [ ] Set dev as default branch on GitHub
+- [ ] Create initial commit with README.md
+- [ ] Understand branching and permission requirements
 
 **Phase 1 Setup:**
 - [ ] Use Project Folder Structure to create directory organization
@@ -182,6 +213,7 @@ This project follows a **frontend-first prototyping approach** using Next.js 14+
 
 ## Success Criteria
 
+**Phase 0**: Git repository initialized with proper branch structure
 **Phase 1**: All user interfaces working with mock data
 **Phase 2**: API endpoints functional with proper error handling
 **Phase 3**: Database persistence working correctly
