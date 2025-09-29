@@ -40,23 +40,41 @@ This project follows a **frontend-first prototyping approach** using Next.js 14+
 **Goal**: Create interactive UI with mock data
 
 **Primary Documents to Use:**
-1. **Figma Design System** → Use for exact UI specifications and component designs
-2. **Component Library Documentation** → Follow for shadcn/ui setup and custom component creation
-3. **Frontend Architecture Document** → Use for project structure, routing, and state management setup
-4. **Project Folder Structure Document** → Follow for organizing files and folders
-5. **Wireframes/Low-Fi Mockups** → Reference for layout structure and user flow
+1. **[projectname]_figma_prompts.md** → Check for existing design prompts FIRST
+2. **[projectname]_style_guide.md** → Use design tokens for all UI decisions
+3. **Figma Make Prompt Generator Guide** → Generate prompts for missing designs
+4. **Component Library Documentation** → Follow for shadcn/ui setup and custom component creation
+5. **Frontend Architecture Document** → Use for project structure, routing, and state management setup
+6. **Project Folder Structure Document** → Follow for organizing files and folders
+7. **Wireframes/Low-Fi Mockups** → Reference for layout structure and user flow
 
 **MCPs to Use:**
 - File System MCP: Create project structure and component files
 - Package Manager MCP: Install Next.js, TypeScript, Tailwind, shadcn/ui, Zustand
+- Figma MCP: Access Figma designs for pixel-perfect implementation
+
+**UI Implementation Workflow:**
+1. **Before implementing any UI component or page:**
+   - Check `[projectname]_figma_prompts.md` for existing design prompt
+   - If prompt exists → Request user to create in Figma Make → Implement from Figma
+   - If no prompt exists or if existing prompt does not contain design system related specs → Follow "docs/design/figma_make_prompt_guide.md" to create one
+2. **Always use design tokens** from `[projectname]_style_guide.md`
+3. **Never hardcode colors, spacing, or typography** - reference style guide tokens
 
 **Key Actions:**
 1. Set up Next.js project with TypeScript
 2. Configure Tailwind CSS and install shadcn/ui components
-3. Create component library based on design system
-4. Build all major pages with mock data
+3. **For each component/page:**
+   - Consult design documentation first
+   - Generate Figma Make prompt if needed
+   - Wait for Figma design from user
+   - Implement pixel-perfect using Figma MCP
+4. Build all major pages following the Figma → Implementation workflow
 5. Implement navigation and basic routing
 6. Add Zustand for state management with mock data
+
+**Critical Reminder:**
+Never implement UI without checking design documentation first. Every visual decision must reference the style guide tokens.
 
 ### Phase 2: API Layer Development
 **Goal**: Add API structure with mock responses
