@@ -153,11 +153,11 @@ export function Header({ className = '', isAuthenticated = true, onSidebarToggle
             ) : (
               <>
                 {/* Guest Header - Sign In/Sign Up buttons */}
-                <Button variant="outline" size="sm">
-                  Sign In
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/login">Sign In</Link>
                 </Button>
-                <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                  Get Started
+                <Button size="sm" className="bg-blue-600 hover:bg-blue-700" asChild>
+                  <Link href="/register">Get Started</Link>
                 </Button>
               </>
             )}
@@ -216,11 +216,11 @@ export function Header({ className = '', isAuthenticated = true, onSidebarToggle
                 <>
                   {/* Mobile Guest Actions */}
                   <div className="space-y-2">
-                    <Button variant="outline" className="w-full">
-                      Sign In
+                    <Button variant="outline" className="w-full" asChild>
+                      <Link href="/login">Sign In</Link>
                     </Button>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                      Get Started
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700" asChild>
+                      <Link href="/register">Get Started</Link>
                     </Button>
                   </div>
                 </>

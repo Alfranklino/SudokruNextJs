@@ -27,7 +27,8 @@
       "Bash(taskkill:*)",
       "Bash(cmd /c:*)",
       "Bash(taskkill.exe:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []
