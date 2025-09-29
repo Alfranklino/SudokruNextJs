@@ -18,7 +18,16 @@
       "Bash(git config:*)",
       "Bash(git checkout:*)",
       "Bash(git commit:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "WebFetch(domain:www.figma.com)",
+      "Bash(npm run lint)",
+      "Bash(npm run lint:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd /c:*)",
+      "Bash(taskkill.exe:*)",
+      "Bash(git log:*)"
     ],
     "deny": [],
     "ask": []

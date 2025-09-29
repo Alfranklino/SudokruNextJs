@@ -8,6 +8,7 @@ import { SudokuGrid } from '@/components/game/SudokuGrid';
 import { GameStatus } from '@/components/game/GameStatus';
 import { PlayerList } from '@/components/game/PlayerList';
 import { Badge } from '@/components/ui/badge';
+import { MainLayout } from '@/components/layout';
 import {
   mockGame,
   mockGameState,
@@ -50,22 +51,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <h1 className="text-3xl font-bold text-gray-900">Sudokru</h1>
-              <Badge className="ml-3 bg-blue-100 text-blue-800">Beta</Badge>
-            </div>
-            <div className="flex space-x-4">
-              <Button variant="outline">Sign In</Button>
-              <Button>Get Started</Button>
-            </div>
-          </div>
-        </div>
-      </header>
+    <MainLayout isAuthenticated={false}>
 
       {/* Hero Section */}
       <section className="py-12 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
@@ -171,7 +157,7 @@ export default function HomePage() {
                       <span className="font-medium text-blue-600">Alice:</span> Good luck everyone!
                     </div>
                     <div className="text-gray-500">
-                      <span className="font-medium text-green-600">Bob:</span> Thanks! Let's have a great game
+                      <span className="font-medium text-green-600">Bob:</span> Thanks! Let&apos;s have a great game
                     </div>
                     <div className="text-gray-500 text-xs">
                       Charlie is spectating
@@ -237,6 +223,6 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
-    </div>
+    </MainLayout>
   );
 }
