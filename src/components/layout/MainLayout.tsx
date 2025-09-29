@@ -19,11 +19,6 @@ export function MainLayout({ children, className = '', isAuthenticated = true }:
 
   return (
     <div className={`min-h-screen bg-gray-50 ${className}`}>
-      <Header
-        isAuthenticated={isAuthenticated}
-        onSidebarToggle={isAuthenticated ? handleSidebarToggle : undefined}
-      />
-
       {/* Show sidebar only if authenticated */}
       {isAuthenticated && (
         <Sidebar
@@ -32,15 +27,16 @@ export function MainLayout({ children, className = '', isAuthenticated = true }:
         />
       )}
 
-      <main
-        className={`flex-1 transition-all duration-300 ease-in-out ${
-          isAuthenticated
-            ? `md:${sidebarOpen ? 'ml-70' : 'ml-16'}`
-            : ''
-        }`}
-      >
-        {children}
-      </main>
+      <div className={`${isAuthenticated ? `${sidebarOpen ? 'ml-64' : 'ml-16'}` : ''} transition-all duration-300 ease-in-out`}>
+        <Header
+          isAuthenticated={isAuthenticated}
+          onSidebarToggle={isAuthenticated ? handleSidebarToggle : undefined}
+        />
+
+        <main className="p-6">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

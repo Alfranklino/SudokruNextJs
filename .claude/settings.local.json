@@ -28,7 +28,8 @@
       "Bash(cmd /c:*)",
       "Bash(taskkill.exe:*)",
       "Bash(git log:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "ask": []

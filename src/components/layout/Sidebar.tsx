@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   Home,
+  Play,
   Gamepad,
   Trophy,
   Users,
@@ -25,6 +26,11 @@ import {
   HelpCircle,
   ChevronLeft,
   ChevronRight,
+  Clock,
+  Zap,
+  Brain,
+  CircleIcon,
+  ArrowRight,
 } from 'lucide-react';
 import { mockCurrentUser } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
@@ -35,22 +41,54 @@ interface SidebarProps {
   className?: string;
 }
 
-const navigationItems = [
+interface NavigationChild {
+  href: string;
+  label: string;
+  icon: React.ComponentType<any>;
+  badge?: string | number;
+  badgeVariant?: 'default' | 'secondary' | 'destructive' | 'outline';
+}
+
+interface NavigationItem {
+  href: string;
+  label: string;
+  icon: React.ComponentType<any>;
+  badge?: string | number;
+  hasChildren?: boolean;
+  children?: NavigationChild[];
+}
+
+const navigationItems: NavigationItem[] = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
-  { href: '/play', label: 'Play', icon: Gamepad },
+  { 
+    href: '/play', 
+    label: 'Play', 
+    icon: Gamepad, 
+    badge: 2,
+    hasChildren: true,
+    children: [
+      { href: '/play/quick', label: 'Quick Match', icon: Zap, badge: '~30s', badgeVariant: 'secondary' },
+      { href: '/play/custom', label: 'Custom Game', icon: Settings },
+      { href: '/play/practice', label: 'Practice Mode', icon: Brain },
+    ]
+  },
   { href: '/tournaments', label: 'Tournaments', icon: Trophy, badge: 3 },
-  { href: '/friends', label: 'Friends', icon: Users },
+  { href: '/friends', label: 'Friends', icon: Users, badge: 5 },
   { href: '/stats', label: 'Statistics', icon: BarChart3 },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
-const bottomItems = [
-  { href: '/settings', label: 'Settings', icon: Settings },
-  { href: '/help', label: 'Help', icon: HelpCircle },
-];
+// Timer state for next tournament
+const getNextTournamentTime = () => {
+  // Mock countdown - in real app this would come from API
+  return { hours: 2, minutes: 45, seconds: 32 };
+};
 
 export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [tournamentTime, setTournamentTime] = useState(getNextTournamentTime());
 
   useEffect(() => {
     const checkMobile = () => {
@@ -62,7 +100,24 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const sidebarWidth = isOpen ? 'w-70' : 'w-16';
+  // Timer for tournament countdown
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTournamentTime(getNextTournamentTime());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const toggleExpanded = (href: string) => {
+    setExpandedItems(prev => 
+      prev.includes(href) 
+        ? prev.filter(item => item !== href)
+        : [...prev, href]
+    );
+  };
+
+  const sidebarWidth = isOpen ? 'w-64' : 'w-16';
   const sidebarTransform = isMobile && !isOpen ? '-translate-x-full' : 'translate-x-0';
 
   return (
@@ -78,20 +133,176 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 z-40 transition-all duration-300 ease-in-out flex flex-col',
+          'fixed top-0 left-0 h-screen bg-slate-50 border-r border-slate-200 z-40 transition-all duration-300 ease-in-out flex flex-col',
           sidebarWidth,
           sidebarTransform,
           isMobile && 'shadow-lg',
           className
         )}
       >
-        {/* Toggle Button */}
-        <div className="flex justify-end p-2 border-b border-gray-100">
+        {/* Top Section */}
+        <div className="p-4 space-y-4">
+          {/* Quick Play Button */}
+          <Button 
+            className="w-full bg-green-600 hover:bg-green-700 text-white shadow-lg"
+            size="lg"
+          >
+            <Play className="w-4 h-4 mr-3" />
+            Quick Play
+          </Button>
+
+          {/* Next Tournament Alert */}
+          {isOpen && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-amber-600" />
+                <span className="text-sm font-medium text-amber-800">Next Tournament</span>
+              </div>
+              <div className="font-mono text-lg font-bold text-amber-900">
+                {String(tournamentTime.hours).padStart(2, '0')}:
+                {String(tournamentTime.minutes).padStart(2, '0')}:
+                {String(tournamentTime.seconds).padStart(2, '0')}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-slate-200 mx-4" />
+
+        {/* Navigation Items */}
+        <nav className="flex-1 p-4 space-y-1">
+          {navigationItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href || 
+              (item.hasChildren && item.children?.some(child => pathname === child.href));
+            const isExpanded = expandedItems.includes(item.href);
+
+            return (
+              <div key={item.href}>
+                {item.hasChildren && isOpen ? (
+                  <button
+                    onClick={() => toggleExpanded(item.href)}
+                    className={cn(
+                      'w-full flex items-center px-3 py-2.5 rounded-md transition-colors text-left',
+                      isActive
+                        ? 'bg-blue-500 text-white shadow-sm'
+                        : 'text-slate-700 hover:bg-slate-100'
+                    )}
+                  >
+                    <Icon className="w-4 h-4 mr-3 flex-shrink-0" />
+                    <span className="text-sm font-medium flex-1">{item.label}</span>
+                    {item.badge && (
+                      <Badge variant={isActive ? "secondary" : "destructive"} className="mr-2 text-xs">
+                        {item.badge}
+                      </Badge>
+                    )}
+                    <ChevronRight className={cn(
+                      "w-4 h-4 transition-transform",
+                      isExpanded && "rotate-90"
+                    )} />
+                  </button>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      'flex items-center px-3 py-2.5 rounded-md transition-colors relative group',
+                      isActive
+                        ? 'bg-blue-500 text-white shadow-sm'
+                        : 'text-slate-700 hover:bg-slate-100',
+                      !isOpen && 'justify-center'
+                    )}
+                    title={!isOpen ? item.label : undefined}
+                  >
+                    <Icon className={cn('w-4 h-4 flex-shrink-0', isOpen && 'mr-3')} />
+
+                    {isOpen && (
+                      <>
+                        <span className="text-sm font-medium">{item.label}</span>
+                        {item.badge && (
+                          <Badge variant={isActive ? "secondary" : "outline"} className="ml-auto text-xs">
+                            {item.badge}
+                          </Badge>
+                        )}
+                      </>
+                    )}
+
+                    {/* Tooltip for collapsed state */}
+                    {!isOpen && (
+                      <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                        {item.label}
+                        {item.badge && (
+                          <span className="ml-1 bg-red-500 text-white px-1 rounded-full">
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </Link>
+                )}
+
+                {/* Children items */}
+                {item.hasChildren && isExpanded && isOpen && (
+                  <div className="ml-6 mt-1 space-y-1">
+                    {item.children?.map((child) => {
+                      const ChildIcon = child.icon;
+                      const isChildActive = pathname === child.href;
+
+                      return (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          className={cn(
+                            'flex items-center px-3 py-2 rounded-md transition-colors text-sm',
+                            isChildActive
+                              ? 'bg-slate-200 text-slate-900'
+                              : 'text-slate-600 hover:bg-slate-100'
+                          )}
+                        >
+                          <ChildIcon className="w-4 h-4 mr-3 flex-shrink-0" />
+                          <span className="flex-1">{child.label}</span>
+                          {child.badge && (
+                            <Badge 
+                              variant={child.badgeVariant === 'secondary' ? 'secondary' : 'outline'} 
+                              className="text-xs"
+                            >
+                              {child.badge}
+                            </Badge>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </nav>
+
+        {/* Divider */}
+        <div className="border-t border-slate-200 mx-4" />
+
+        {/* Live Games Alert */}
+        {isOpen && (
+          <div className="m-4 bg-green-50 border border-green-200 rounded-lg p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-sm font-medium text-green-800">2 Live Games</span>
+            </div>
+            <button className="text-xs text-green-700 hover:text-green-800 font-medium flex items-center gap-1">
+              View Active Games
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          </div>
+        )}
+
+        {/* Collapse Button */}
+        <div className="p-4 border-t border-slate-200">
           <Button
             variant="ghost"
             size="sm"
             onClick={onToggle}
-            className="h-8 w-8 p-0"
+            className="w-full justify-center"
           >
             {isOpen ? (
               <ChevronLeft className="h-4 w-4" />
@@ -99,178 +310,6 @@ export function Sidebar({ isOpen, onToggle, className = '' }: SidebarProps) {
               <ChevronRight className="h-4 w-4" />
             )}
           </Button>
-        </div>
-
-        {/* Navigation Items */}
-        <nav className="flex-1 p-4 space-y-1">
-          {navigationItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex items-center px-3 py-2 rounded-md transition-colors relative group',
-                  isActive
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600',
-                  !isOpen && 'justify-center'
-                )}
-                title={!isOpen ? item.label : undefined}
-              >
-                <Icon className={cn('h-5 w-5 flex-shrink-0', isOpen && 'mr-3')} />
-
-                {isOpen && (
-                  <>
-                    <span className="text-sm font-medium">{item.label}</span>
-                    {item.badge && (
-                      <Badge className="ml-auto bg-red-100 text-red-800 text-xs">
-                        {item.badge}
-                      </Badge>
-                    )}
-                  </>
-                )}
-
-                {/* Tooltip for collapsed state */}
-                {!isOpen && (
-                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                    {item.label}
-                    {item.badge && (
-                      <span className="ml-1 bg-red-500 text-white px-1 rounded-full">
-                        {item.badge}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Bottom Section */}
-        <div className="border-t border-gray-200 p-4 space-y-1">
-          {/* Bottom Navigation Items */}
-          {bottomItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex items-center px-3 py-2 rounded-md transition-colors relative group',
-                  isActive
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600',
-                  !isOpen && 'justify-center'
-                )}
-                title={!isOpen ? item.label : undefined}
-              >
-                <Icon className={cn('h-5 w-5 flex-shrink-0', isOpen && 'mr-3')} />
-
-                {isOpen && (
-                  <span className="text-sm font-medium">{item.label}</span>
-                )}
-
-                {/* Tooltip for collapsed state */}
-                {!isOpen && (
-                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                    {item.label}
-                  </div>
-                )}
-              </Link>
-            );
-          })}
-
-          {/* User Profile Section */}
-          <div className="pt-2 border-t border-gray-100">
-            {isOpen ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start px-3 py-2 h-auto"
-                  >
-                    <Avatar className="h-8 w-8 mr-3">
-                      <AvatarImage src={mockCurrentUser.avatar} alt={mockCurrentUser.username} />
-                      <AvatarFallback className="text-xs">
-                        {mockCurrentUser.username[0].toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="text-left flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 truncate">
-                        {mockCurrentUser.username}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        Rating: {mockCurrentUser.rating}
-                      </div>
-                    </div>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile" className="flex items-center">
-                      <User className="w-4 h-4 mr-2" />
-                      Profile
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/settings" className="flex items-center">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Settings
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-red-600">
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <div className="flex justify-center">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-10 w-10 p-0">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={mockCurrentUser.avatar} alt={mockCurrentUser.username} />
-                        <AvatarFallback className="text-xs">
-                          {mockCurrentUser.username[0].toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56 ml-2">
-                    <div className="px-2 py-1.5 text-sm">
-                      <div className="font-medium">{mockCurrentUser.username}</div>
-                      <div className="text-xs text-gray-500">Rating: {mockCurrentUser.rating}</div>
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/profile" className="flex items-center">
-                        <User className="w-4 h-4 mr-2" />
-                        Profile
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/settings" className="flex items-center">
-                        <Settings className="w-4 h-4 mr-2" />
-                        Settings
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-red-600">
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Sign Out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </>
