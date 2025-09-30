@@ -24,6 +24,7 @@ import {
 import { useSinglePlayerStore } from '@/stores/singlePlayerStore';
 import type { Difficulty } from '@/lib/sudoku/difficulty';
 import { DIFFICULTY_CONFIG } from '@/lib/sudoku/difficulty';
+import { DEFAULT_HIGHLIGHT_CONFIG } from '@/types/game-config';
 
 const difficultyLevels = [
   {
@@ -229,6 +230,7 @@ export default function SinglePlayerPage() {
                           currentGrid={currentGrid}
                           solution={solution}
                           showErrors={showErrors}
+                          highlightConfig={DEFAULT_HIGHLIGHT_CONFIG}
                           onCellChange={handleCellChange}
                           readOnly={gameStatus === 'paused' || gameStatus === 'completed'}
                           className="scale-110"

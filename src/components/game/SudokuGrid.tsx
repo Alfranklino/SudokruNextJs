@@ -7,6 +7,8 @@ import { GAME_CONFIG } from '@/lib/constants';
 import { NumberSelector } from './NumberSelector';
 import { CandidateNumbers } from './CandidateNumbers';
 import { useCellFloatingPosition } from '@/hooks/useFloatingPosition';
+import type { HighlightConfig } from '@/types/game-config';
+import { DEFAULT_HIGHLIGHT_CONFIG } from '@/types/game-config';
 
 interface SudokuGridProps {
   initialGrid: number[][];
@@ -15,6 +17,7 @@ interface SudokuGridProps {
   readOnly?: boolean;
   showErrors?: boolean;
   highlightCell?: { row: number; col: number };
+  highlightConfig?: HighlightConfig;
   onCellChange?: (row: number, col: number, value: number) => void;
   onCellSelect?: (row: number, col: number) => void;
   className?: string;
@@ -26,6 +29,8 @@ interface CellProps {
   isError: boolean;
   isHighlighted: boolean;
   isSelected: boolean;
+  isRowColumnHighlighted: boolean;
+  isSameNumberHighlighted: boolean;
   candidates: Set<number>;
   onChange: (value: number) => void;
   onSelect: () => void;
@@ -40,6 +45,8 @@ const SudokuCell = memo(({
   isError,
   isHighlighted,
   isSelected,
+  isRowColumnHighlighted,
+  isSameNumberHighlighted,
   candidates,
   onChange,
   onSelect,
@@ -65,9 +72,8 @@ const SudokuCell = memo(({
   };
 
   const handleClick = () => {
-    if (!readOnly && !isInitial) {
-      onSelect();
-    }
+    // Allow selection of any cell for highlighting purposes
+    onSelect();
   };
 
   return (
@@ -75,15 +81,17 @@ const SudokuCell = memo(({
       className={cn(
         'w-10 h-10 border border-gray-300 flex items-center justify-center text-lg font-semibold transition-all duration-200',
         'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10',
-        'relative',
+        'relative cursor-pointer',
         !isInitial && !readOnly && 'hover:bg-gray-50',
         'md:w-12 md:h-12 md:text-xl', // Larger on desktop
         {
-          'bg-gray-100 text-gray-800 cursor-default font-bold': isInitial,
-          'bg-white cursor-pointer': !isInitial && !readOnly,
+          'bg-gray-100 text-gray-800 font-bold': isInitial,
+          'bg-white': !isInitial && !readOnly && !isRowColumnHighlighted && !isSameNumberHighlighted && !isSelected && !isError,
           'bg-red-50 border-red-300 text-red-600': isError,
           'bg-blue-50 border-blue-300': isHighlighted,
           'ring-2 ring-blue-500 bg-blue-100': isSelected,
+          'bg-blue-50': isRowColumnHighlighted && !isSelected && !isError && !isSameNumberHighlighted,
+          'bg-purple-100': isSameNumberHighlighted && !isSelected && !isError,
           'cursor-not-allowed opacity-50': readOnly,
           // Add thicker borders for 3x3 box separation
           'border-r-2 border-gray-800': (col + 1) % 3 === 0 && col !== 8,
@@ -92,8 +100,8 @@ const SudokuCell = memo(({
       )}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      disabled={readOnly || isInitial}
-      tabIndex={readOnly || isInitial ? -1 : 0}
+      disabled={readOnly}
+      tabIndex={readOnly ? -1 : 0}
       data-row={row}
       data-col={col}
       aria-label={`Cell at row ${row + 1}, column ${col + 1}${value ? `, value ${value}` : ', empty'}`}
@@ -120,6 +128,7 @@ export const SudokuGrid = memo(({
   readOnly = false,
   showErrors = false,
   highlightCell,
+  highlightConfig = DEFAULT_HIGHLIGHT_CONFIG,
   onCellChange,
   onCellSelect,
   className
@@ -137,15 +146,18 @@ export const SudokuGrid = memo(({
   );
 
   const handleCellSelect = useCallback((row: number, col: number) => {
-    // Prevent selection of initial/fixed cells
-    const isInitialCell = initialGrid[row][col] !== 0;
-    if (isInitialCell) {
-      return;
-    }
-
+    // Allow selection of any cell (including initial cells) for highlighting
     const newCell = { row, col };
     setSelectedCell(newCell);
-    setShowNumberSelector(true);
+
+    // Only show number selector for editable cells
+    const isInitialCell = initialGrid[row][col] !== 0;
+    if (!isInitialCell) {
+      setShowNumberSelector(true);
+    } else {
+      setShowNumberSelector(false);
+    }
+
     onCellSelect?.(row, col);
   }, [onCellSelect, initialGrid]);
 
@@ -203,8 +215,19 @@ export const SudokuGrid = memo(({
   };
 
   const isError = (row: number, col: number, value: number): boolean => {
-    if (!showErrors || !solution || value === 0) return false;
+    if (!highlightConfig.showErrors || !showErrors || !solution || value === 0) return false;
     return solution[row][col] !== value;
+  };
+
+  const isRowColumnHighlighted = (row: number, col: number): boolean => {
+    if (!highlightConfig.highlightRowColumn || !selectedCell) return false;
+    return selectedCell.row === row || selectedCell.col === col;
+  };
+
+  const isSameNumberHighlighted = (row: number, col: number, value: number): boolean => {
+    if (!highlightConfig.highlightSameNumber || !selectedCell || value === 0) return false;
+    const selectedValue = currentGrid[selectedCell.row][selectedCell.col];
+    return selectedValue !== 0 && selectedValue === value;
   };
 
   // Validate grid dimensions
@@ -231,6 +254,8 @@ export const SudokuGrid = memo(({
             const isHighlighted = highlightCell?.row === rowIndex && highlightCell?.col === colIndex;
             const isSelected = selectedCell?.row === rowIndex && selectedCell?.col === colIndex;
             const hasError = isError(rowIndex, colIndex, cellValue);
+            const isRowColHighlight = isRowColumnHighlighted(rowIndex, colIndex) && !isSelected;
+            const isSameNumHighlight = isSameNumberHighlighted(rowIndex, colIndex, cellValue) && !isSelected;
 
             return (
               <SudokuCell
@@ -240,6 +265,8 @@ export const SudokuGrid = memo(({
                 isError={hasError}
                 isHighlighted={isHighlighted}
                 isSelected={isSelected}
+                isRowColumnHighlighted={isRowColHighlight}
+                isSameNumberHighlighted={isSameNumHighlight}
                 candidates={getCandidatesForCell(rowIndex, colIndex)}
                 onChange={(value) => handleCellChange(rowIndex, colIndex, value)}
                 onSelect={() => handleCellSelect(rowIndex, colIndex)}
