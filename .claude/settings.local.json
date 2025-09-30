@@ -37,7 +37,14 @@
       "Bash(claude mcp add playwright:*)",
       "Bash(claude mcp add:*)",
       "Bash(claude mcp:*)",
-      "Bash(claude)"
+      "Bash(claude)",
+      "Bash(cd:*)",
+      "Bash(timeout:*)",
+      "Bash(Get-Process -Id 83800)",
+      "Bash(Stop-Process -Force)",
+      "Bash(powershell:*)",
+      "mcp__playwright__playwright_navigate",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

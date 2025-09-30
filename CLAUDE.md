@@ -1079,3 +1079,4 @@ DATABASE_URL="postgresql://..."  # PostgreSQL for production
 5. **Use MCPs** - Leverage available tools for efficiency
 6. **Stay organized** - Keep documentation in `/docs` subdirectories
 7. **Follow conventions** - ES modules, TypeScript strict mode, design tokens only
+- Never push to remote without my approval.

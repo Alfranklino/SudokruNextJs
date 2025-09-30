@@ -60,13 +60,14 @@ interface NavigationItem {
 
 const navigationItems: NavigationItem[] = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
-  { 
-    href: '/play', 
-    label: 'Play', 
-    icon: Gamepad, 
+  {
+    href: '/play',
+    label: 'Play',
+    icon: Gamepad,
     badge: 2,
     hasChildren: true,
     children: [
+      { href: '/play/single', label: 'Single Player', icon: Play },
       { href: '/play/quick', label: 'Quick Match', icon: Zap, badge: '~30s', badgeVariant: 'secondary' },
       { href: '/play/custom', label: 'Custom Game', icon: Settings },
       { href: '/play/practice', label: 'Practice Mode', icon: Brain },

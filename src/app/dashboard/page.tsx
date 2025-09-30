@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { MainLayout } from '@/components/layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -103,10 +104,19 @@ export default function DashboardPage() {
 
                 <div className="mb-4">
                   <div className="text-sm text-slate-600 mb-3">Game Mode</div>
-                  <div className="flex gap-2 mb-4">
-                    <Button variant="outline" size="sm" className="text-slate-600">⚡ Quick Match</Button>
-                    <Button variant="outline" size="sm" className="text-slate-600">🎯 Custom Game</Button>
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">🏆 Tournaments</Button>
+                  <div className="flex gap-2 mb-4 flex-wrap">
+                    <Button variant="outline" size="sm" className="text-slate-600" asChild>
+                      <Link href="/play/single">🎮 Single Player</Link>
+                    </Button>
+                    <Button variant="outline" size="sm" className="text-slate-600" asChild>
+                      <Link href="/play/quick">⚡ Quick Match</Link>
+                    </Button>
+                    <Button variant="outline" size="sm" className="text-slate-600" asChild>
+                      <Link href="/play/custom">🎯 Custom Game</Link>
+                    </Button>
+                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" asChild>
+                      <Link href="/tournaments">🏆 Tournaments</Link>
+                    </Button>
                     <Badge className="bg-blue-100 text-blue-800">Active</Badge>
                   </div>
                 </div>
