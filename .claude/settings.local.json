@@ -29,7 +29,11 @@
       "Bash(taskkill.exe:*)",
       "Bash(git log:*)",
       "Bash(ls:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Read(//c/**)",
+      "Bash(npm run build:*)",
+      "mcp__figma-remote-mcp__get_screenshot",
+      "mcp__figma-remote-mcp__get_code"
     ],
     "deny": [],
     "ask": []
