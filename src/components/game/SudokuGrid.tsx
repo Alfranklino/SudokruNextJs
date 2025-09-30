@@ -79,9 +79,10 @@ const SudokuCell = memo(({
   return (
     <button
       className={cn(
-        'w-10 h-10 border border-gray-300 flex items-center justify-center text-lg font-semibold transition-all duration-200',
+        'w-10 h-10 flex items-center justify-center text-lg font-semibold transition-all duration-200',
         'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:z-10',
         'relative cursor-pointer',
+        'border-[1px] border-solid border-gray-300',
         !isInitial && !readOnly && 'hover:bg-gray-50',
         'md:w-12 md:h-12 md:text-xl', // Larger on desktop
         {
@@ -93,9 +94,14 @@ const SudokuCell = memo(({
           'bg-blue-50': isRowColumnHighlighted && !isSelected && !isError && !isSameNumberHighlighted,
           'bg-purple-100': isSameNumberHighlighted && !isSelected && !isError,
           'cursor-not-allowed opacity-50': readOnly,
-          // Add thicker borders for 3x3 box separation
-          'border-r-2 border-gray-800': (col + 1) % 3 === 0 && col !== 8,
-          'border-b-2 border-gray-800': (row + 1) % 3 === 0 && row !== 8,
+          // Thicker borders for 3x3 box separation (2px, dark gray)
+          'border-r-[2px] border-r-gray-700': (col + 1) % 3 === 0 && col !== 8,
+          'border-b-[2px] border-b-gray-700': (row + 1) % 3 === 0 && row !== 8,
+          // Rounded corners for corner cells
+          'rounded-tl-lg': row === 0 && col === 0,
+          'rounded-tr-lg': row === 0 && col === 8,
+          'rounded-bl-lg': row === 8 && col === 0,
+          'rounded-br-lg': row === 8 && col === 8,
         }
       )}
       onClick={handleClick}
@@ -242,9 +248,9 @@ export const SudokuGrid = memo(({
 
   return (
     <>
-      <div className={cn('inline-block bg-gray-800 p-1 rounded-lg shadow-lg', className)} ref={gridRef}>
+      <div className={cn('inline-block rounded-xl shadow-lg overflow-hidden', className)} ref={gridRef}>
         <div
-          className="grid grid-cols-9 gap-0 bg-white rounded"
+          className="grid grid-cols-9 gap-0 bg-white border-[4px] border-solid border-gray-700 rounded-xl overflow-hidden"
           role="grid"
           aria-label="Sudoku puzzle grid"
         >
