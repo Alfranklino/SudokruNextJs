@@ -1,118 +1,184 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import confetti from 'canvas-confetti';
 import { MainLayout } from '@/components/layout';
 import { SudokuGrid } from '@/components/game/SudokuGrid';
+import { GameTimer } from '@/components/game/GameTimer';
+import { TestUtilities } from '@/components/game/TestUtilities';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import {
   Settings,
   ArrowLeft,
-  Cloud,
+  Play,
+  Pause,
+  RotateCcw,
+  StopCircle,
   Star,
-  Clock,
-  Brain,
-  CheckCircle,
-  Play
+  Trophy,
+  TrendingUp
 } from 'lucide-react';
-
-// Mock Sudoku grid data
-const mockInitialGrid = [
-  [5, 3, 0, 0, 7, 0, 0, 0, 0],
-  [6, 0, 0, 1, 9, 5, 0, 0, 0],
-  [0, 9, 8, 0, 0, 0, 0, 6, 0],
-  [8, 0, 0, 0, 6, 0, 0, 0, 3],
-  [4, 0, 0, 8, 0, 3, 0, 0, 1],
-  [7, 0, 0, 0, 2, 0, 0, 0, 6],
-  [0, 6, 0, 0, 0, 0, 2, 8, 0],
-  [0, 0, 0, 4, 1, 9, 0, 0, 5],
-  [0, 0, 0, 0, 8, 0, 0, 7, 9]
-];
-
-const mockCurrentGrid = [
-  [5, 3, 4, 6, 7, 8, 9, 1, 2],
-  [6, 7, 2, 1, 9, 5, 3, 4, 8],
-  [1, 9, 8, 3, 4, 2, 5, 6, 7],
-  [8, 5, 9, 7, 6, 1, 4, 2, 3],
-  [4, 2, 6, 8, 5, 3, 7, 9, 1],
-  [7, 1, 3, 9, 2, 4, 8, 5, 6],
-  [9, 6, 1, 5, 3, 7, 2, 8, 4],
-  [2, 8, 7, 4, 1, 9, 6, 3, 5],
-  [3, 4, 5, 2, 8, 6, 1, 7, 9]
-];
+import { useSinglePlayerStore } from '@/stores/singlePlayerStore';
+import type { Difficulty } from '@/lib/sudoku/difficulty';
+import { DIFFICULTY_CONFIG } from '@/lib/sudoku/difficulty';
 
 const difficultyLevels = [
   {
-    id: 'easy',
+    id: 'easy' as Difficulty,
     name: 'Easy',
     color: 'bg-green-500',
     borderColor: 'border-green-200',
     bgColor: 'bg-green-50',
     textColor: 'text-green-900',
-    rating: 1,
-    bestTime: '8:32',
-    successRate: '98%',
-    masteryProgress: 98,
     description: 'Perfect for beginners and learning basic techniques'
   },
   {
-    id: 'medium',
+    id: 'medium' as Difficulty,
     name: 'Medium',
     color: 'bg-blue-500',
     borderColor: 'border-blue-200',
     bgColor: 'bg-blue-50',
     textColor: 'text-blue-900',
-    rating: 3,
-    bestTime: '12:45',
-    successRate: '87%',
-    masteryProgress: 67,
     description: 'Intermediate puzzles with moderate complexity'
   },
   {
-    id: 'hard',
+    id: 'hard' as Difficulty,
     name: 'Hard',
     color: 'bg-orange-500',
     borderColor: 'border-orange-200',
     bgColor: 'bg-orange-50',
     textColor: 'text-orange-900',
-    rating: 4,
-    bestTime: '39:15',
-    successRate: '73%',
-    masteryProgress: 45,
     description: 'Advanced puzzles requiring strategic thinking'
   },
   {
-    id: 'expert',
+    id: 'expert' as Difficulty,
     name: 'Expert',
     color: 'bg-red-500',
     borderColor: 'border-red-200',
     bgColor: 'bg-red-50',
     textColor: 'text-red-900',
-    rating: 5,
-    bestTime: '52:19',
-    successRate: '62%',
-    masteryProgress: 12,
     description: 'Master-level puzzles for true Sudoku experts'
   }
 ];
 
 export default function SinglePlayerPage() {
-  const [currentGrid, setCurrentGrid] = useState(mockCurrentGrid);
-  const [selectedDifficulty, setSelectedDifficulty] = useState('medium');
-  const [cloudSyncEnabled, setCloudSyncEnabled] = useState(true);
+  const router = useRouter();
+  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('medium');
+  const [selectedTimerMode, setSelectedTimerMode] = useState<'unlimited' | 'timed'>('unlimited');
+  const [selectedDuration, setSelectedDuration] = useState<number>(600); // 10 minutes default
+  const [showErrors, setShowErrors] = useState(false);
+  const [hasShownConfetti, setHasShownConfetti] = useState(false);
+
+  const {
+    gameStatus,
+    difficulty,
+    initialGrid,
+    currentGrid,
+    solution,
+    timerMode,
+    duration,
+    elapsedTime,
+    isTimerRunning,
+    moveCount,
+    errorCount,
+    startNewGame,
+    pauseGame,
+    resumeGame,
+    stopGame,
+    restartGame,
+    makeMove,
+    updateElapsedTime,
+    autoFillSolution,
+  } = useSinglePlayerStore();
+
+  // Trigger confetti on game completion
+  useEffect(() => {
+    if (gameStatus === 'completed' && !hasShownConfetti) {
+      setHasShownConfetti(true);
+
+      // Fire confetti
+      const duration = 3000;
+      const animationEnd = Date.now() + duration;
+
+      const randomInRange = (min: number, max: number) => {
+        return Math.random() * (max - min) + min;
+      };
+
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+
+        confetti({
+          particleCount: 3,
+          angle: randomInRange(55, 125),
+          spread: randomInRange(50, 70),
+          origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 },
+          colors: ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'],
+        });
+      }, 50);
+    }
+  }, [gameStatus, hasShownConfetti]);
+
+  // Reset confetti flag when starting new game
+  useEffect(() => {
+    if (gameStatus === 'playing') {
+      setHasShownConfetti(false);
+    }
+  }, [gameStatus]);
+
+  const handleStartGame = () => {
+    startNewGame(
+      selectedDifficulty,
+      selectedTimerMode,
+      selectedTimerMode === 'timed' ? selectedDuration : undefined
+    );
+  };
 
   const handleCellChange = (row: number, col: number, value: number) => {
-    const newGrid = currentGrid.map((r, rowIndex) =>
-      rowIndex === row
-        ? r.map((cell, colIndex) => (colIndex === col ? value : cell))
-        : r
-    );
-    setCurrentGrid(newGrid);
+    makeMove(row, col, value);
   };
 
-  const handleCellSelect = (row: number, col: number) => {
-    console.log(`Selected cell: ${row}, ${col}`);
+  const handleStopGame = () => {
+    if (confirm('Are you sure you want to stop this game? Your progress will be lost.')) {
+      stopGame();
+    }
   };
+
+  const handleBackToMenu = () => {
+    if (gameStatus === 'playing' || gameStatus === 'paused') {
+      if (confirm('Are you sure you want to leave? Your current game will be lost.')) {
+        router.push('/dashboard');
+      }
+    } else {
+      router.push('/dashboard');
+    }
+  };
+
+  // Test utilities handlers
+  const handleAutoFill = () => {
+    autoFillSolution();
+  };
+
+  const handleGenerateNew = (diff: Difficulty) => {
+    setSelectedDifficulty(diff);
+    startNewGame(diff, selectedTimerMode, selectedTimerMode === 'timed' ? selectedDuration : undefined);
+  };
+
+  const handlePrintSolution = () => {
+    if (solution) {
+      console.log('=== SOLUTION ===');
+      solution.forEach(row => console.log(row.join(' ')));
+      console.log('================');
+    }
+  };
+
+  const isGameActive = gameStatus === 'playing' || gameStatus === 'paused';
 
   return (
     <MainLayout isAuthenticated={true}>
@@ -127,188 +193,260 @@ export default function SinglePlayerPage() {
               <span>/</span>
               <span className="text-slate-900 font-medium">Single Player</span>
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">Single Player</h1>
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold text-slate-900">Single Player</h1>
+              {gameStatus === 'completed' && (
+                <Badge className="bg-green-100 text-green-800 text-lg px-4 py-2">
+                  <Trophy className="w-5 h-5 mr-2" />
+                  Puzzle Completed!
+                </Badge>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-12 gap-8">
             {/* Left Column - Sudoku Grid */}
             <div className="col-span-8">
-              <div className="bg-white rounded-xl p-8 shadow-sm">
-                <div className="flex justify-center">
-                  <SudokuGrid
-                    initialGrid={mockInitialGrid}
-                    currentGrid={currentGrid}
-                    onCellChange={handleCellChange}
-                    onCellSelect={handleCellSelect}
-                    className="scale-110"
-                  />
-                </div>
-                <div className="text-center mt-6">
-                  <p className="text-slate-500 text-sm">Enter numbers 1-9 to solve the puzzle</p>
-                </div>
-              </div>
+              <Card className="p-8">
+                {isGameActive ? (
+                  <>
+                    {/* Timer */}
+                    <div className="mb-6">
+                      <GameTimer
+                        mode={timerMode}
+                        elapsedTime={elapsedTime}
+                        duration={duration}
+                        isRunning={isTimerRunning}
+                        onTimeUpdate={updateElapsedTime}
+                      />
+                    </div>
+
+                    {/* Grid */}
+                    <div className="flex justify-center">
+                      {initialGrid && currentGrid && solution && (
+                        <SudokuGrid
+                          initialGrid={initialGrid}
+                          currentGrid={currentGrid}
+                          solution={solution}
+                          showErrors={showErrors}
+                          onCellChange={handleCellChange}
+                          readOnly={gameStatus === 'paused' || gameStatus === 'completed'}
+                          className="scale-110"
+                        />
+                      )}
+                    </div>
+
+                    {/* Game stats */}
+                    <div className="mt-6 flex items-center justify-center gap-6 text-sm">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 text-blue-600" />
+                        <span className="text-slate-600">Moves:</span>
+                        <span className="font-semibold text-slate-900">{moveCount}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-600">Errors:</span>
+                        <span className="font-semibold text-red-600">{errorCount}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Star className="w-4 h-4 text-yellow-500" />
+                        <span className="text-slate-600">Difficulty:</span>
+                        <Badge variant="outline">{DIFFICULTY_CONFIG[difficulty].name}</Badge>
+                      </div>
+                    </div>
+
+                    {gameStatus === 'paused' && (
+                      <div className="mt-6 text-center">
+                        <p className="text-lg font-semibold text-slate-900">Game Paused</p>
+                        <p className="text-sm text-slate-500 mt-1">Click Resume to continue playing</p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-12">
+                    <Play className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                    <p className="text-lg font-semibold text-slate-900 mb-2">Ready to Play?</p>
+                    <p className="text-sm text-slate-500">Select your difficulty and timer mode, then click Start Game</p>
+                  </div>
+                )}
+              </Card>
             </div>
 
-            {/* Right Column - Control Panel */}
+            {/* Right Column - Controls */}
             <div className="col-span-4 space-y-6">
               {/* Game Controls */}
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                  <Settings className="w-5 h-5" />
-                  Game Controls
-                </h3>
-                <div className="space-y-3">
-                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
-                    New Game
-                  </Button>
-                  <Button variant="outline" className="w-full">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Game Settings
-                  </Button>
-                  <Button variant="outline" className="w-full">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to Menu
-                  </Button>
-                </div>
-              </div>
-
-              {/* Cloud Sync */}
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <Cloud className="w-5 h-5 text-blue-600" />
-                    <span className="font-medium text-slate-900">Cloud Sync</span>
-                  </div>
-                  <Badge className="bg-blue-100 text-blue-800">BACKED</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">Auto-save</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-slate-500">Every 5 minutes</span>
-                    <button
-                      onClick={() => setCloudSyncEnabled(!cloudSyncEnabled)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        cloudSyncEnabled ? 'bg-blue-600' : 'bg-gray-200'
-                      }`}
+              {isGameActive && (
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                    <Settings className="w-5 h-5" />
+                    Game Controls
+                  </h3>
+                  <div className="space-y-3">
+                    {gameStatus === 'playing' && (
+                      <Button
+                        onClick={pauseGame}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        <Pause className="w-4 h-4 mr-2" />
+                        Pause Game
+                      </Button>
+                    )}
+                    {gameStatus === 'paused' && (
+                      <Button
+                        onClick={resumeGame}
+                        className="w-full bg-green-600 hover:bg-green-700"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        Resume Game
+                      </Button>
+                    )}
+                    <Button
+                      onClick={restartGame}
+                      variant="outline"
+                      className="w-full"
                     >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                          cloudSyncEnabled ? 'translate-x-6' : 'translate-x-1'
-                        }`}
-                      />
-                    </button>
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      Restart Game
+                    </Button>
+                    <Button
+                      onClick={handleStopGame}
+                      variant="destructive"
+                      className="w-full"
+                    >
+                      <StopCircle className="w-4 h-4 mr-2" />
+                      Stop Game
+                    </Button>
                   </div>
-                </div>
-              </div>
+                </Card>
+              )}
 
               {/* Select Difficulty */}
-              <div className="bg-white rounded-xl p-6 shadow-sm">
+              <Card className="p-6">
                 <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
                   <Star className="w-5 h-5 text-yellow-500" />
                   Select Difficulty
                 </h3>
                 <div className="space-y-3">
-                  {difficultyLevels.map((difficulty) => (
+                  {difficultyLevels.map((diff) => (
                     <div
-                      key={difficulty.id}
+                      key={diff.id}
                       className={`border rounded-lg p-4 cursor-pointer transition-all ${
-                        selectedDifficulty === difficulty.id
-                          ? `${difficulty.borderColor} ${difficulty.bgColor}`
+                        selectedDifficulty === diff.id
+                          ? `${diff.borderColor} ${diff.bgColor}`
                           : 'border-slate-200 hover:border-slate-300'
                       }`}
-                      onClick={() => setSelectedDifficulty(difficulty.id)}
+                      onClick={() => setSelectedDifficulty(diff.id)}
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-3 h-3 rounded-full ${difficulty.color}`} />
-                          <span className={`font-medium ${
-                            selectedDifficulty === difficulty.id ? difficulty.textColor : 'text-slate-900'
-                          }`}>
-                            {difficulty.name}
-                          </span>
-                          <div className="flex">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-3 h-3 ${
-                                  i < difficulty.rating
-                                    ? 'text-yellow-400 fill-current'
-                                    : 'text-gray-300'
-                                }`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-medium text-slate-900">{difficulty.bestTime}</div>
-                          <div className="text-xs text-slate-500">Best Time</div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className={`w-3 h-3 rounded-full ${diff.color}`} />
+                        <span className={`font-medium ${
+                          selectedDifficulty === diff.id ? diff.textColor : 'text-slate-900'
+                        }`}>
+                          {diff.name}
+                        </span>
+                        <div className="flex ml-auto">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-3 h-3 ${
+                                i < DIFFICULTY_CONFIG[diff.id].rating
+                                  ? 'text-yellow-400 fill-current'
+                                  : 'text-gray-300'
+                              }`}
+                            />
+                          ))}
                         </div>
                       </div>
-                      <div className="text-xs text-slate-600 mb-2">{difficulty.description}</div>
-                      <div className="grid grid-cols-3 gap-4 text-xs mb-3">
-                        <div className="text-center">
-                          <div className="font-medium text-slate-900">{difficulty.bestTime}</div>
-                          <div className="text-slate-500">Best Time</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-medium text-slate-900">{difficulty.successRate}</div>
-                          <div className="text-slate-500">Success Rate</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-medium text-slate-900">{difficulty.masteryProgress}%</div>
-                          <div className="text-slate-500">Mastery</div>
-                        </div>
-                      </div>
-                      <div className="mb-2">
-                        <div className="text-xs text-slate-500 mb-1">Mastery Progress</div>
-                        <div className="w-full bg-slate-100 rounded-full h-2">
-                          <div
-                            className={`h-2 rounded-full ${difficulty.color}`}
-                            style={{ width: `${difficulty.masteryProgress}%` }}
-                          />
-                        </div>
-                        <div className="text-xs text-slate-500 mt-1">{difficulty.masteryProgress}%</div>
-                      </div>
+                      <div className="text-xs text-slate-600">{diff.description}</div>
                     </div>
                   ))}
                 </div>
-              </div>
+              </Card>
 
-              {/* Quick Start Options */}
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Start Options</h3>
+              {/* Timer Mode */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Timer Mode</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
-                      <span className="text-sm font-medium">Recommended: Medium</span>
-                    </div>
+                  <div
+                    className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                      selectedTimerMode === 'unlimited'
+                        ? 'border-blue-300 bg-blue-50'
+                        : 'border-slate-200 hover:border-slate-300'
+                    }`}
+                    onClick={() => setSelectedTimerMode('unlimited')}
+                  >
+                    <div className="font-medium text-slate-900">Unlimited Time</div>
+                    <div className="text-xs text-slate-600 mt-1">No time pressure, solve at your own pace</div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-blue-600" />
-                      <span className="text-sm font-medium">Continue Where I Left Off</span>
-                    </div>
+                  <div
+                    className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                      selectedTimerMode === 'timed'
+                        ? 'border-orange-300 bg-orange-50'
+                        : 'border-slate-200 hover:border-slate-300'
+                    }`}
+                    onClick={() => setSelectedTimerMode('timed')}
+                  >
+                    <div className="font-medium text-slate-900">Timed Challenge</div>
+                    <div className="text-xs text-slate-600 mt-1">Race against the clock</div>
+                    {selectedTimerMode === 'timed' && (
+                      <div className="mt-3">
+                        <label className="text-xs text-slate-600 block mb-1">Duration (minutes):</label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="60"
+                          value={Math.floor(selectedDuration / 60)}
+                          onChange={(e) => setSelectedDuration(parseInt(e.target.value) * 60)}
+                          className="w-full px-3 py-2 border border-slate-300 rounded text-sm"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
+              </Card>
 
-              {/* Learning Path */}
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                  <Brain className="w-5 h-5 text-blue-600" />
-                  Learning Path
-                </h3>
-                <div className="space-y-3">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <div className="text-sm font-medium text-blue-900">Master each difficulty level with 90%+ success rate for efficient advancement. Each level teaches essential techniques for competitive play.</div>
-                  </div>
-                  <Button variant="outline" className="w-full">
-                    <Play className="w-4 h-4 mr-2" />
-                    Start Learning Path
-                  </Button>
-                </div>
-              </div>
+              {/* Start/New Game Button */}
+              {!isGameActive && (
+                <Button
+                  onClick={handleStartGame}
+                  size="lg"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Play className="w-5 h-5 mr-2" />
+                  Start Game
+                </Button>
+              )}
+
+              {gameStatus === 'completed' && (
+                <Button
+                  onClick={handleStartGame}
+                  size="lg"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Play className="w-5 h-5 mr-2" />
+                  New Game
+                </Button>
+              )}
+
+              {/* Back to Menu */}
+              <Button
+                onClick={handleBackToMenu}
+                variant="outline"
+                className="w-full"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Menu
+              </Button>
+
+              {/* Test Utilities (dev only) */}
+              <TestUtilities
+                onAutoFill={handleAutoFill}
+                onGenerateNew={handleGenerateNew}
+                onToggleErrors={() => setShowErrors(!showErrors)}
+                onPrintSolution={handlePrintSolution}
+                showErrors={showErrors}
+                currentDifficulty={difficulty}
+              />
             </div>
           </div>
         </div>
