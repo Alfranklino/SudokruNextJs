@@ -147,19 +147,15 @@ export const useSinglePlayerStore = create<SinglePlayerState>((set, get) => ({
     // Check if cell is editable (not part of initial puzzle)
     if (initialGrid[row][col] !== 0) return false;
 
-    // Validate the move
-    if (value !== 0 && !isValidMove(currentGrid, row, col, value)) {
-      // Invalid move - increment error count
-      set(state => ({ errorCount: state.errorCount + 1 }));
-      return false;
-    }
-
     // Create new grid with the move
     const newGrid = copyGrid(currentGrid);
     newGrid[row][col] = value;
 
-    // Track if this is an incorrect move
-    const isError = value !== 0 && value !== solution[row][col];
+    // Check if move violates Sudoku rules (duplicate in row/col/box)
+    const isInvalidMove = value !== 0 && !isValidMove(currentGrid, row, col, value);
+
+    // Track if this is an incorrect move (doesn't match solution)
+    const isIncorrectMove = value !== 0 && value !== solution[row][col];
 
     // Record the move
     const move: Move = {
@@ -172,12 +168,14 @@ export const useSinglePlayerStore = create<SinglePlayerState>((set, get) => ({
     set(state => ({
       currentGrid: newGrid,
       moveCount: state.moveCount + 1,
-      errorCount: isError ? state.errorCount + 1 : state.errorCount,
+      errorCount: isInvalidMove || isIncorrectMove ? state.errorCount + 1 : state.errorCount,
       moveHistory: [...state.moveHistory, move],
     }));
 
-    // Check if game is complete
-    get().checkCompletion();
+    // Check if game is complete (only if no invalid moves)
+    if (!isInvalidMove) {
+      get().checkCompletion();
+    }
 
     return true;
   },

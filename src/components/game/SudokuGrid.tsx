@@ -9,6 +9,7 @@ import { CandidateNumbers } from './CandidateNumbers';
 import { useCellFloatingPosition } from '@/hooks/useFloatingPosition';
 import type { HighlightConfig } from '@/types/game-config';
 import { DEFAULT_HIGHLIGHT_CONFIG } from '@/types/game-config';
+import { hasCellConflict } from '@/lib/sudoku/validator';
 
 interface SudokuGridProps {
   initialGrid: number[][];
@@ -27,6 +28,7 @@ interface CellProps {
   value: number;
   isInitial: boolean;
   isError: boolean;
+  hasConflict: boolean;
   isHighlighted: boolean;
   isSelected: boolean;
   isRowColumnHighlighted: boolean;
@@ -43,6 +45,7 @@ const SudokuCell = memo(({
   value,
   isInitial,
   isError,
+  hasConflict,
   isHighlighted,
   isSelected,
   isRowColumnHighlighted,
@@ -113,7 +116,12 @@ const SudokuCell = memo(({
       aria-label={`Cell at row ${row + 1}, column ${col + 1}${value ? `, value ${value}` : ', empty'}`}
     >
       {value !== 0 ? (
-        <span className="relative z-10">{value}</span>
+        <span className={cn(
+          'relative z-10',
+          hasConflict && 'text-red-600 font-bold'
+        )}>
+          {value}
+        </span>
       ) : (
         <CandidateNumbers
           candidates={candidates}
@@ -260,6 +268,7 @@ export const SudokuGrid = memo(({
             const isHighlighted = highlightCell?.row === rowIndex && highlightCell?.col === colIndex;
             const isSelected = selectedCell?.row === rowIndex && selectedCell?.col === colIndex;
             const hasError = isError(rowIndex, colIndex, cellValue);
+            const cellHasConflict = hasCellConflict(currentGrid, rowIndex, colIndex);
             const isRowColHighlight = isRowColumnHighlighted(rowIndex, colIndex) && !isSelected;
             const isSameNumHighlight = isSameNumberHighlighted(rowIndex, colIndex, cellValue) && !isSelected;
 
@@ -269,6 +278,7 @@ export const SudokuGrid = memo(({
                 value={cellValue}
                 isInitial={isInitial}
                 isError={hasError}
+                hasConflict={cellHasConflict}
                 isHighlighted={isHighlighted}
                 isSelected={isSelected}
                 isRowColumnHighlighted={isRowColHighlight}
