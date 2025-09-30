@@ -6,6 +6,8 @@ import confetti from 'canvas-confetti';
 import { MainLayout } from '@/components/layout';
 import { SudokuGrid } from '@/components/game/SudokuGrid';
 import { GameTimer } from '@/components/game/GameTimer';
+import { GameStats } from '@/components/game/GameStats';
+import { NumberTracker } from '@/components/game/NumberTracker';
 import { TestUtilities } from '@/components/game/TestUtilities';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -223,7 +225,7 @@ export default function SinglePlayerPage() {
                     </div>
 
                     {/* Grid */}
-                    <div className="flex justify-center">
+                    <div className="flex justify-center mb-6">
                       {initialGrid && currentGrid && solution && (
                         <SudokuGrid
                           initialGrid={initialGrid}
@@ -238,7 +240,7 @@ export default function SinglePlayerPage() {
                       )}
                     </div>
 
-                    {/* Game stats */}
+                    {/* Game Stats Bar */}
                     <div className="mt-6 flex items-center justify-center gap-6 text-sm">
                       <div className="flex items-center gap-2">
                         <TrendingUp className="w-4 h-4 text-blue-600" />
@@ -255,6 +257,15 @@ export default function SinglePlayerPage() {
                         <Badge variant="outline">{DIFFICULTY_CONFIG[difficulty].name}</Badge>
                       </div>
                     </div>
+
+                    {/* Number Tracker */}
+                    {currentGrid && (
+                      <div className="mt-6">
+                        <NumberTracker
+                          currentGrid={currentGrid}
+                        />
+                      </div>
+                    )}
 
                     {gameStatus === 'paused' && (
                       <div className="mt-6 text-center">
