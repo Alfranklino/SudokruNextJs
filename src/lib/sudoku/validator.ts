@@ -20,40 +20,35 @@ export function isValidMove(
     return false;
   }
 
-  // Temporarily remove the current value to check if placement is valid
-  const original = grid[row][col];
-  grid[row][col] = 0;
+  const currentValue = grid[row][col];
 
-  // Check row for conflicts
+  // Check row for conflicts (skip the cell itself)
   for (let c = 0; c < 9; c++) {
-    if (grid[row][c] === num) {
-      grid[row][col] = original;
+    if (c !== col && grid[row][c] === num) {
       return false;
     }
   }
 
-  // Check column for conflicts
+  // Check column for conflicts (skip the cell itself)
   for (let r = 0; r < 9; r++) {
-    if (grid[r][col] === num) {
-      grid[row][col] = original;
+    if (r !== row && grid[r][col] === num) {
       return false;
     }
   }
 
-  // Check 3x3 box for conflicts
+  // Check 3x3 box for conflicts (skip the cell itself)
   const boxStartRow = Math.floor(row / 3) * 3;
   const boxStartCol = Math.floor(col / 3) * 3;
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
-      if (grid[boxStartRow + i][boxStartCol + j] === num) {
-        grid[row][col] = original;
+      const r = boxStartRow + i;
+      const c = boxStartCol + j;
+      if ((r !== row || c !== col) && grid[r][c] === num) {
         return false;
       }
     }
   }
 
-  // Restore original value
-  grid[row][col] = original;
   return true;
 }
 
