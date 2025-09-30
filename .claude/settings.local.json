@@ -33,7 +33,11 @@
       "Read(//c/**)",
       "Bash(npm run build:*)",
       "mcp__figma-remote-mcp__get_screenshot",
-      "mcp__figma-remote-mcp__get_code"
+      "mcp__figma-remote-mcp__get_code",
+      "Bash(claude mcp add playwright:*)",
+      "Bash(claude mcp add:*)",
+      "Bash(claude mcp:*)",
+      "Bash(claude)"
     ],
     "deny": [],
     "ask": []

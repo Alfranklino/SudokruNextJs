@@ -52,6 +52,8 @@ This project follows a **frontend-first prototyping approach** using Next.js 14+
 - File System MCP: Create project structure and component files
 - Package Manager MCP: Install Next.js, TypeScript, Tailwind, shadcn/ui, Zustand
 - Figma MCP: Access Figma designs for pixel-perfect implementation
+- Playwright MCP: Browser automation and testing
+- Context7 MCP: Access up-to-date documentation for Next.js, React, and other libraries
 
 **UI Implementation Workflow:**
 1. **Before implementing any UI component or page:**
