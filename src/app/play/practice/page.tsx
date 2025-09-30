@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { MainLayout } from '@/components/layout';
+import { Breadcrumb } from '@/components/layout/Breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -54,9 +56,11 @@ export default function PracticeModePage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Practice Mode</h1>
+    <MainLayout isAuthenticated={true}>
+      <div className="max-w-6xl mx-auto space-y-6">
+        <Breadcrumb />
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Practice Mode</h1>
         <p className="text-gray-600 mt-2">
           Improve your Sudoku skills with guided lessons and challenges
         </p>
@@ -216,6 +220,7 @@ export default function PracticeModePage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </MainLayout>
   );
 }

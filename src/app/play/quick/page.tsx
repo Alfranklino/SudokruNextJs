@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { MainLayout } from '@/components/layout';
+import { Breadcrumb } from '@/components/layout/Breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -19,9 +21,11 @@ export default function QuickMatchPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Quick Match</h1>
+    <MainLayout isAuthenticated={true}>
+      <div className="max-w-4xl mx-auto space-y-6">
+        <Breadcrumb />
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Quick Match</h1>
         <p className="text-gray-600 mt-2">
           Get matched with players of similar skill level in under 30 seconds
         </p>
@@ -122,6 +126,7 @@ export default function QuickMatchPage() {
           </CardContent>
         </Card>
       )}
-    </div>
+      </div>
+    </MainLayout>
   );
 }

@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { MainLayout } from '@/components/layout';
+import { Breadcrumb } from '@/components/layout/Breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -23,7 +25,9 @@ export default function CustomGamePage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <MainLayout isAuthenticated={true}>
+      <div className="max-w-4xl mx-auto space-y-6">
+        <Breadcrumb />
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Custom Game</h1>
         <p className="text-gray-600 mt-2">
@@ -220,6 +224,7 @@ export default function CustomGamePage() {
           </Card>
         </div>
       </div>
-    </div>
+      </div>
+    </MainLayout>
   );
 }

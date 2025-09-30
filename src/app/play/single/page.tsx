@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import confetti from 'canvas-confetti';
 import { MainLayout } from '@/components/layout';
+import { Breadcrumb } from '@/components/layout/Breadcrumb';
 import { SudokuGrid } from '@/components/game/SudokuGrid';
 import { GameTimer } from '@/components/game/GameTimer';
 import { GameStats } from '@/components/game/GameStats';
@@ -187,15 +188,11 @@ export default function SinglePlayerPage() {
     <MainLayout isAuthenticated={true}>
       <div className="min-h-screen bg-slate-50">
         <div className="max-w-7xl mx-auto p-6">
+          {/* Breadcrumb */}
+          <Breadcrumb />
+
           {/* Header */}
           <div className="mb-6">
-            <div className="flex items-center gap-2 text-sm text-slate-500 mb-2">
-              <span>Home</span>
-              <span>/</span>
-              <span>Play</span>
-              <span>/</span>
-              <span className="text-slate-900 font-medium">Single Player</span>
-            </div>
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold text-slate-900">Single Player</h1>
               {gameStatus === 'completed' && (
