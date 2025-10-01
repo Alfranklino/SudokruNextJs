@@ -58,6 +58,57 @@ See `docs/development/sudokru_folder_structure.md` for complete project structur
 
 ## Development Workflow
 
+### CRITICAL: Setup Custom Slash Commands (First Time Setup)
+
+**⚠️ IMPORTANT: Create these custom commands at the start of EVERY new project!**
+
+Custom slash commands are stored in `.claude/commands/` and provide quick access to common workflows. Commands MUST be **Markdown (`.md`) files**, not JSON.
+
+**Required Commands:**
+
+1. **`/commit`** - Commit changes and remain on same branch
+2. **`/merge-dev`** - Commit, switch to dev, merge, and push
+3. **`/restart`** - Kill port 3000 and restart dev server
+4. **`/clean`** - Clean screenshots and test-results folders
+5. **`/restore`** - Restore branch to last commit (asks confirmation)
+
+**How to create:**
+```bash
+mkdir -p .claude/commands
+# Then create .md files for each command (see template below)
+```
+
+**Command Template Example** (`commit.md`):
+```markdown
+---
+description: Commit changes and remain on the same branch
+allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*)
+---
+
+Commit all current changes to git and remain on the same branch. Follow these steps:
+
+1. Run git status to see what has changed
+2. Run git diff to show the changes
+3. Stage all relevant files (exclude .claude/settings.local.json)
+4. Create a detailed commit message following the conventional commits format
+5. Include all file changes in the commit message
+6. Verify the commit was successful
+7. Remain on the current branch
+
+Do NOT ask for permission - just commit the changes.
+```
+
+**Key Points:**
+- File format: Markdown (`.md`), NOT JSON
+- Filename = command name (e.g., `commit.md` → `/commit`)
+- Frontmatter with YAML (`---` delimiters)
+- Optional: `description`, `allowed-tools`, `argument-hint`, `model`
+- Supports `$ARGUMENTS`, `$1`, `$2` for arguments
+
+**See**: Check this project's `.claude/commands/` for complete examples to copy to new projects.
+
+---
+
 ### Current Phase: Phase 2 (API Layer)
 See `docs/development/claude_code_entry_guide.md` for detailed phase instructions.
 
@@ -216,8 +267,8 @@ test('launch browser and navigate to app', async ({ page }) => {
 
 ---
 
-**Version**: 2.1
-**Last Updated**: 2025-10-01
+**Version**: 6.0
+**Last Updated**: 2025-09-30
 **Maintained By**: Sudokru Development Team
 
 ---
