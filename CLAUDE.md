@@ -71,6 +71,9 @@ Custom slash commands are stored in `.claude/commands/` and provide quick access
 3. **`/restart`** - Kill port 3000 and restart dev server
 4. **`/clean`** - Clean screenshots and test-results folders
 5. **`/restore`** - Restore branch to last commit (asks confirmation)
+6. **`/new-branch`** - Create new branch based off current branch
+7. **`/inspect`** - Inspect page with Playwright and generate report
+8. **`/update-claude-md`** - Update CLAUDE.md and create versioned template
 
 **How to create:**
 ```bash
@@ -106,6 +109,30 @@ Do NOT ask for permission - just commit the changes.
 - Supports `$ARGUMENTS`, `$1`, `$2` for arguments
 
 **See**: Check this project's `.claude/commands/` for complete examples to copy to new projects.
+
+#### New Command Details
+
+##### `/new-branch` - Smart Branch Creation
+Creates a new Git branch from current branch with intelligent naming:
+- Handles uncommitted changes (commit or stash)
+- Auto-detects branch type (feat/fix/test/experimental)
+- Converts descriptions to kebab-case branch names
+- Example: `/new-branch "add authentication"` → `feat/add-authentication`
+
+##### `/inspect` - Automated Page Testing
+Inspects pages using Playwright with comprehensive reporting:
+- Takes full-page screenshots
+- Tests specified functionality
+- Captures console errors
+- Generates markdown reports with images
+- Example: `/inspect /dashboard "navigation links and stats"`
+
+##### `/update-claude-md` - Version-Controlled Documentation
+Updates CLAUDE.md with automatic versioning:
+- Creates versioned template backups
+- Preserves all existing content
+- Updates version number and date
+- Example: `/update-claude-md "add new testing guidelines"`
 
 ---
 
@@ -257,6 +284,7 @@ test('launch browser and navigate to app', async ({ page }) => {
 ✅ Dashboard and navigation
 ✅ Type definitions
 ✅ Playwright testing setup (local)
+✅ Custom slash commands (8 total)
 
 ### Next Priorities (Phase 2)
 - WebSocket server setup
@@ -267,7 +295,7 @@ test('launch browser and navigate to app', async ({ page }) => {
 
 ---
 
-**Version**: 6.0
+**Version**: 7.0
 **Last Updated**: 2025-09-30
 **Maintained By**: Sudokru Development Team
 
@@ -280,5 +308,6 @@ test('launch browser and navigate to app', async ({ page }) => {
 4. Follow `docs/development/git_guidelines.md` for commits
 5. Ask permission before Git operations
 6. Launch Figma QA Validator after Figma implementations
+7. Use custom slash commands for common workflows
 - Never push a branch to remote without expressly asking for permission.
 - REMEMBER: Always run the app on port 3000. If in use, kill the process on it and restart the app. Do not use a new port.
