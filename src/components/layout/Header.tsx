@@ -139,9 +139,9 @@ export function Header({ className = '', isAuthenticated = true, onSidebarToggle
                 variant="ghost"
                 size="sm"
                 onClick={onSidebarToggle}
-                className="mr-4 h-8 w-8 p-0"
+                className={`mr-4 h-8 w-8 p-0 ${isDark ? 'hover:bg-gray-700' : ''}`}
               >
-                <Menu className="h-5 w-5" />
+                <Menu className={`h-5 w-5 ${textClasses}`} />
               </Button>
             )}
 
@@ -154,7 +154,7 @@ export function Header({ className = '', isAuthenticated = true, onSidebarToggle
                 className="h-9 w-auto transition-opacity duration-500"
                 priority
               />
-              <Badge className="text-xs bg-blue-100 text-blue-800">
+              <Badge className={`text-xs ${isDark ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
                 Beta
               </Badge>
             </Link>
