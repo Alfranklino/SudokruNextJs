@@ -18,7 +18,7 @@ export default function StatsPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Games Played</CardTitle>
@@ -68,7 +68,7 @@ export default function StatsPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -144,7 +144,7 @@ export default function StatsPage() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="mt-6">
         <CardHeader>
           <CardTitle>Recent Games</CardTitle>
         </CardHeader>
