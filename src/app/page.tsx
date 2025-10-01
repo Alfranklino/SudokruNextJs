@@ -170,30 +170,34 @@ export default function HomePage() {
                   className="
                     bg-blue-600 hover:bg-blue-700
                     text-white font-semibold
-                    px-8 py-6 text-lg h-auto
+                    px-8 py-4 text-lg
+                    h-14
                     transform hover:scale-105
                     transition-all duration-200
                     shadow-xl hover:shadow-2xl hover:shadow-blue-500/50
                     group
                   "
                 >
-                  <Play className="w-6 h-6 mr-2 group-hover:animate-pulse" />
+                  <Play className="w-5 h-5 mr-2 group-hover:animate-pulse" />
                   Start Playing Free
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
                   className="
-                    border-2 border-white/30
+                    border-2 border-white/50
                     text-white backdrop-blur-sm
-                    hover:bg-white/10 hover:border-white/50
-                    px-8 py-6 text-lg h-auto font-semibold
+                    bg-white/5
+                    hover:bg-white/15 hover:border-white/70
+                    px-8 py-4 text-lg
+                    h-14
+                    font-semibold
                     transition-all duration-200
                   "
                   asChild
                 >
                   <Link href="#how-it-works">
-                    <PlayCircle className="w-6 h-6 mr-2" />
+                    <PlayCircle className="w-5 h-5 mr-2" />
                     How It Works
                   </Link>
                 </Button>

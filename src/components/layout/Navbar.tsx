@@ -68,24 +68,62 @@ export function Navbar({
     { href: '/stats', label: 'Statistics', icon: BarChart3 },
   ];
 
-  // GSAP ScrollTrigger for theme change
+  // GSAP ScrollTrigger for smooth theme change
   useGSAP(() => {
     if (!enableScrollChange || !navRef.current) return;
 
+    // Use GSAP to animate navbar properties smoothly
+    const navElement = navRef.current;
+
     ScrollTrigger.create({
-      start: '100px top',
-      end: 'bottom bottom',
+      start: '50px top',
+      end: '200px top',
+      scrub: 0.5, // Smooth scrubbing
       onUpdate: (self) => {
-        setIsDark(self.progress > 0);
+        const progress = self.progress;
+
+        // Smoothly transition between light and dark
+        if (progress > 0.3 && !isDark) {
+          setIsDark(true);
+        } else if (progress <= 0.3 && isDark) {
+          setIsDark(false);
+        }
+
+        // Animate background opacity
+        gsap.to(navElement, {
+          backgroundColor: progress > 0.3
+            ? 'rgba(15, 23, 42, 0.95)'
+            : 'rgba(255, 255, 255, 1)',
+          duration: 0.6,
+          ease: 'power2.out',
+        });
+
+        // Animate border
+        gsap.to(navElement, {
+          borderColor: progress > 0.3
+            ? 'rgba(55, 65, 81, 1)'
+            : 'rgba(229, 231, 235, 1)',
+          duration: 0.6,
+          ease: 'power2.out',
+        });
+
+        // Animate shadow
+        gsap.to(navElement, {
+          boxShadow: progress > 0.3
+            ? '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)'
+            : '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+          duration: 0.6,
+          ease: 'power2.out',
+        });
       },
     });
 
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     };
-  }, [enableScrollChange]);
+  }, [enableScrollChange, isDark]);
 
-  // Dynamic classes based on theme
+  // Dynamic classes based on theme with smooth transitions
   const navClasses = isDark
     ? 'bg-slate-900/95 backdrop-blur-md border-gray-700 shadow-xl'
     : 'bg-white border-gray-200';
@@ -99,7 +137,10 @@ export function Navbar({
   return (
     <nav
       ref={navRef}
-      className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${navClasses}`}
+      className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-500 ease-out ${navClasses}`}
+      style={{
+        transitionProperty: 'background-color, border-color, box-shadow, color',
+      }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
