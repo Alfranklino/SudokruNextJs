@@ -1,17 +1,13 @@
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
+import { VisitorLayout } from '@/components/layout/VisitorLayout';
 import { ComingSoon } from '@/components/layout/ComingSoon';
 
 export default function HelpPage() {
   return (
-    <>
-      <Navbar variant="visitor" enableScrollChange={false} />
-      <div className="h-16" />
+    <VisitorLayout>
       <ComingSoon
         title="Help Center"
         description="Find answers to common questions and get support for your Sudokru account."
       />
-      <Footer />
-    </>
+    </VisitorLayout>
   );
 }

@@ -1,17 +1,13 @@
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
+import { VisitorLayout } from '@/components/layout/VisitorLayout';
 import { ComingSoon } from '@/components/layout/ComingSoon';
 
 export default function TermsPage() {
   return (
-    <>
-      <Navbar variant="visitor" enableScrollChange={false} />
-      <div className="h-16" />
+    <VisitorLayout>
       <ComingSoon
         title="Terms of Service"
         description="Read our terms and conditions for using Sudokru platform."
       />
-      <Footer />
-    </>
+    </VisitorLayout>
   );
 }

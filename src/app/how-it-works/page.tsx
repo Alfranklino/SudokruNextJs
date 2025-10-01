@@ -3,8 +3,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
+import { VisitorLayout } from '@/components/layout/VisitorLayout';
 import {
   Play,
   UserPlus,
@@ -68,10 +67,7 @@ export default function HowItWorksPage() {
   ];
 
   return (
-    <>
-      <Navbar variant="visitor" enableScrollChange={false} />
-      <div className="h-16" />
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <VisitorLayout className="bg-gradient-to-b from-slate-50 to-white">
         {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -268,8 +264,6 @@ export default function HowItWorksPage() {
           </Link>
         </div>
       </section>
-      </div>
-      <Footer />
-    </>
+    </VisitorLayout>
   );
 }

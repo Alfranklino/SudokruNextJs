@@ -1,17 +1,13 @@
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
+import { VisitorLayout } from '@/components/layout/VisitorLayout';
 import { ComingSoon } from '@/components/layout/ComingSoon';
 
 export default function PrivacyPage() {
   return (
-    <>
-      <Navbar variant="visitor" enableScrollChange={false} />
-      <div className="h-16" />
+    <VisitorLayout>
       <ComingSoon
         title="Privacy Policy"
         description="Learn how we collect, use, and protect your personal information."
       />
-      <Footer />
-    </>
+    </VisitorLayout>
   );
 }

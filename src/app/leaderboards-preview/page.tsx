@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
+import { VisitorLayout } from '@/components/layout/VisitorLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -61,9 +60,7 @@ export default function LeaderboardsPreviewPage() {
   ];
 
   return (
-    <>
-      <Navbar variant="visitor" enableScrollChange={false} />
-      <div className="h-16" />
+    <VisitorLayout>
 
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-20">
@@ -231,8 +228,6 @@ export default function LeaderboardsPreviewPage() {
           </div>
         </div>
       </section>
-
-      <Footer />
-    </>
+    </VisitorLayout>
   );
 }

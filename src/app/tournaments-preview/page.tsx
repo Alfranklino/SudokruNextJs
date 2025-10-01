@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
+import { VisitorLayout } from '@/components/layout/VisitorLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -55,9 +54,7 @@ export default function TournamentsPreviewPage() {
   ];
 
   return (
-    <>
-      <Navbar variant="visitor" enableScrollChange={false} />
-      <div className="h-16" />
+    <VisitorLayout>
 
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-20">
@@ -211,8 +208,6 @@ export default function TournamentsPreviewPage() {
           </div>
         </div>
       </section>
-
-      <Footer />
-    </>
+    </VisitorLayout>
   );
 }
