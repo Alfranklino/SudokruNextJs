@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import confetti from 'canvas-confetti';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -147,6 +148,18 @@ export default function HomePage() {
 
             {/* Left: Content */}
             <div className="space-y-8">
+              {/* Logo */}
+              <div className="mb-6">
+                <Image
+                  src="/images/brand/SudoKru_Logo_Brand.webp"
+                  alt="Sudokru"
+                  width={400}
+                  height={100}
+                  className="h-24 sm:h-28 lg:h-32 w-auto drop-shadow-2xl"
+                  priority
+                />
+              </div>
+
               {/* Headline */}
               <div className="space-y-4">
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight">

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -159,11 +160,16 @@ export function Navbar({
             )}
 
             {/* Logo */}
-            <Link href="/" className="flex items-center">
-              <h1 className={`text-2xl font-bold transition-colors ${textClasses}`}>
-                Sudokru
-              </h1>
-              <Badge className={`ml-2 text-xs transition-colors ${
+            <Link href="/" className="flex items-center gap-3">
+              <Image
+                src="/images/brand/SudoKru_Logo_Brand.webp"
+                alt="Sudokru"
+                width={140}
+                height={36}
+                className="h-9 w-auto transition-opacity duration-500"
+                priority
+              />
+              <Badge className={`text-xs transition-colors ${
                 isDark
                   ? 'bg-blue-500/20 text-blue-300 border-blue-400/30'
                   : 'bg-blue-100 text-blue-800'
