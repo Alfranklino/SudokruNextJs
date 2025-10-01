@@ -37,7 +37,7 @@ export function VisitorLayout({ children, className = '' }: VisitorLayoutProps) 
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
 
-      <main className={`flex-1 ${className}`}>
+      <main className={`flex-1 pt-16 ${className}`}>
         {children}
       </main>
 
