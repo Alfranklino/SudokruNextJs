@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -63,9 +64,18 @@ export function Header({ className = '', isAuthenticated = true, onSidebarToggle
               </Button>
             )}
 
-            <Link href="/" className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">Sudokru</h1>
-              <Badge className="ml-2 bg-blue-100 text-blue-800 text-xs">Beta</Badge>
+            <Link href="/" className="flex items-center gap-3">
+              <Image
+                src="/images/brand/SudoKru_Logo_Brand.webp"
+                alt="Sudokru"
+                width={140}
+                height={36}
+                className="h-9 w-auto transition-opacity duration-500"
+                priority
+              />
+              <Badge className="text-xs bg-blue-100 text-blue-800">
+                Beta
+              </Badge>
             </Link>
 
             {/* Desktop Navigation - Only show if authenticated */}
