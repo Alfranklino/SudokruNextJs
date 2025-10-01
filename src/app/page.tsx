@@ -204,7 +204,8 @@ export default function HomePage() {
               </div>
 
               {/* Social Proof */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 text-gray-300 text-sm">
+              <div className="flex flex-col gap-3 text-gray-300 text-sm">
+                {/* Player Count */}
                 <div className="flex items-center gap-3">
                   <div className="flex -space-x-2">
                     {[1, 2, 3, 4, 5].map((i) => (
@@ -218,6 +219,8 @@ export default function HomePage() {
                     Join <span className="text-blue-400 font-bold">10,000+</span> players worldwide
                   </span>
                 </div>
+
+                {/* Ratings */}
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-1">
                     {[1, 2, 3, 4, 5].map((i) => (
