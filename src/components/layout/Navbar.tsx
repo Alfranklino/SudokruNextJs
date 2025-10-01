@@ -59,6 +59,9 @@ export function Navbar({
     { href: '/', label: 'Home' },
     { href: '/#features', label: 'Features' },
     { href: '/how-it-works', label: 'How It Works' },
+    { href: '/play-now', label: 'Play Now' },
+    { href: '/about', label: 'About Us' },
+    { href: '/contact', label: 'Contact' },
   ];
 
   const authenticatedNavItems = [

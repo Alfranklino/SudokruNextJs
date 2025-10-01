@@ -12,9 +12,9 @@ export function Footer() {
             <Image
               src="/images/brand/SudoKru_Logo_Gold.webp"
               alt="Sudokru"
-              width={200}
-              height={52}
-              className="h-12 w-auto mb-4"
+              width={400}
+              height={104}
+              className="h-24 w-auto mb-4"
             />
             <p className="text-gray-400 text-sm mb-4">
               The ultimate multiplayer Sudoku experience. Compete, collaborate, and master the game.
