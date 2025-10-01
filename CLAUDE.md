@@ -12,7 +12,7 @@ Sudokru is a modern, multiplayer Sudoku gaming platform combining competitive ga
 - **State**: Zustand
 - **Database**: SQLite (dev), PostgreSQL (prod), Prisma ORM
 - **Real-time**: Socket.io
-- **Testing**: Playwright MCP
+- **Testing**: Playwright (local installation)
 - **Documentation**: Context7 MCP
 
 ## Quick Reference
@@ -46,7 +46,7 @@ See `docs/development/sudokru_folder_structure.md` for complete project structur
 
 ### Git Workflow
 - **NEVER** commit directly to `dev` or `main`
-- **ALWAYS** use feature branches: `feat/`, `fix/`, `experimental/`
+- **ALWAYS** use feature branches: `feat/`, `fix/`, `experimental/`, `test/`
 - **NEVER** push, merge, or create PR without explicit permission
 - Follow `docs/development/git_guidelines.md` exactly
 
@@ -69,9 +69,10 @@ See `docs/development/claude_code_entry_guide.md` for detailed phase instruction
 
 ### Common Commands
 ```bash
-npm run dev              # Start dev server (Turbopack)
-npm run build            # Production build
-npm run lint             # Run ESLint
+npm run dev                        # Start dev server (Turbopack)
+npm run build                      # Production build
+npm run lint                       # Run ESLint
+npx playwright test --headed       # Run Playwright tests (visible browser)
 
 # Git (ask permission first)
 git checkout -b feat/feature-name
@@ -82,14 +83,15 @@ git commit -m "type: description"
 
 ### Available MCPs
 - **Figma MCP**: Pixel-perfect implementation from designs
-- **Playwright MCP**: Browser automation, testing, QA
 - **Context7 MCP**: Up-to-date library documentation
 - **File System, Package Manager, Database, Git, IDE MCPs**
 
 ### Key MCP Workflows
 - **UI Implementation**: Use Figma MCP → Implement → **Launch Figma QA Validator**
-- **Testing**: Use Playwright MCP for E2E tests and visual regression
 - **Documentation**: Use Context7 MCP for current library docs
+
+### Important Notes
+- **Playwright**: Use local installation (`@playwright/test`) instead of Playwright MCP for better control and reliability
 
 ## Specialized Subagents
 
@@ -113,12 +115,50 @@ Task({
 
 ## Testing & QA
 
-### Playwright Testing
-- **Visual Testing**: Compare Figma vs live implementation
-- **Interaction Testing**: Test all interactive elements
+### Playwright Testing Setup
+
+**Local Playwright Installation (Preferred Method)**:
+```bash
+# Install Playwright as project dependency
+npm install @playwright/test
+
+# Install browsers for local Playwright
+npx playwright install chromium
+
+# Run tests with visible browser
+npx playwright test [test-file] --headed
+```
+
+**Why Local Playwright > Playwright MCP:**
+- ✅ Full control over test scripts and configuration
+- ✅ Repeatable tests saved in codebase
+- ✅ CI/CD integration ready
+- ✅ Better error messages and debugging
+- ✅ No dependency on external MCP server
+- ✅ Version controlled alongside code
+
+### Testing Capabilities
+- **Visual Testing**: Compare Figma vs live implementation, screenshot capture
+- **Interaction Testing**: Test all interactive elements (click, fill, hover, keyboard)
 - **Responsive Testing**: Mobile (375x667), Tablet (768x1024), Desktop (1920x1080)
 - **Accessibility**: Keyboard nav, ARIA labels, semantic HTML
 - **Performance**: Console errors, load times, animations
+
+### Sample Test Script
+```typescript
+import { test, expect } from '@playwright/test';
+
+test.use({
+  headless: false,
+  viewport: { width: 1920, height: 1080 }
+});
+
+test('launch browser and navigate to app', async ({ page }) => {
+  await page.goto('http://localhost:3000');
+  await page.waitForLoadState('networkidle');
+  await page.screenshot({ path: 'homepage-screenshot.png', fullPage: true });
+});
+```
 
 ### QA Checklist (Before marking complete)
 - [ ] Matches Figma design pixel-perfectly
@@ -165,6 +205,7 @@ Task({
 ✅ Responsive design
 ✅ Dashboard and navigation
 ✅ Type definitions
+✅ Playwright testing setup (local)
 
 ### Next Priorities (Phase 2)
 - WebSocket server setup
@@ -175,8 +216,8 @@ Task({
 
 ---
 
-**Version**: 2.0
-**Last Updated**: 2025-09-30
+**Version**: 2.1
+**Last Updated**: 2025-10-01
 **Maintained By**: Sudokru Development Team
 
 ---
@@ -189,3 +230,4 @@ Task({
 5. Ask permission before Git operations
 6. Launch Figma QA Validator after Figma implementations
 - Never push a branch to remote without expressly asking for permission.
+- REMEMBER: Always run the app on port 3000. If in use, kill the process on it and restart the app. Do not use a new port.
