@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { MainLayout } from '@/components/layout';
 import { Badge } from '@/components/ui/badge';
@@ -24,6 +25,8 @@ import {
 } from 'lucide-react';
 
 export default function DashboardPage() {
+  const router = useRouter();
+
   return (
     <MainLayout isAuthenticated={true}>
       <div className="min-h-screen bg-slate-50 p-6">
@@ -42,10 +45,17 @@ export default function DashboardPage() {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <Button className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg">
+                <Button
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
+                  onClick={() => router.push('/play/quick')}
+                >
                   ⚡ Quick Play
                 </Button>
-                <Button variant="outline" className="px-6 py-2 rounded-lg">
+                <Button
+                  variant="outline"
+                  className="px-6 py-2 rounded-lg"
+                  onClick={() => router.push('/tournaments')}
+                >
                   🏆 Join Tournament
                 </Button>
               </div>
@@ -200,7 +210,10 @@ export default function DashboardPage() {
                   <span className="text-slate-400">Position: 1 in 30</span>
                 </div>
 
-                <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-base">
+                <Button
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-base"
+                  onClick={() => router.push('/play/quick')}
+                >
                   ⚡ Find Match
                 </Button>
               </div>
@@ -212,8 +225,13 @@ export default function DashboardPage() {
                     <Gamepad2 className="w-5 h-5 text-blue-600" />
                     <h2 className="text-lg font-semibold text-slate-900">Recent Games</h2>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-blue-600">
-                    View All
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-blue-600"
+                    asChild
+                  >
+                    <Link href="/game/history">View All</Link>
                   </Button>
                 </div>
 
@@ -239,10 +257,10 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0">
+                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0" onClick={() => router.push('/game/history')}>
                         <Play className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0">
+                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0" onClick={() => router.push('/game/spectate')}>
                         <Eye className="w-4 h-4" />
                       </Button>
                     </div>
@@ -269,10 +287,10 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0">
+                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0" onClick={() => router.push('/game/history')}>
                         <Play className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0">
+                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0" onClick={() => router.push('/game/spectate')}>
                         <Eye className="w-4 h-4" />
                       </Button>
                     </div>
@@ -299,10 +317,10 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0">
+                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0" onClick={() => router.push('/game/history')}>
                         <Play className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0">
+                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0" onClick={() => router.push('/game/spectate')}>
                         <Eye className="w-4 h-4" />
                       </Button>
                     </div>
@@ -329,10 +347,10 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0">
+                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0" onClick={() => router.push('/game/history')}>
                         <Play className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0">
+                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0" onClick={() => router.push('/game/spectate')}>
                         <Eye className="w-4 h-4" />
                       </Button>
                     </div>
@@ -359,10 +377,10 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0">
+                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0" onClick={() => router.push('/game/history')}>
                         <Play className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0">
+                      <Button size="sm" variant="ghost" className="w-8 h-8 p-0" onClick={() => router.push('/game/spectate')}>
                         <Eye className="w-4 h-4" />
                       </Button>
                     </div>
@@ -392,8 +410,13 @@ export default function DashboardPage() {
                     <Trophy className="w-5 h-5 text-yellow-600" />
                     <h2 className="text-lg font-semibold text-slate-900">Tournament Highlights</h2>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-blue-600">
-                    Browse All
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-blue-600"
+                    asChild
+                  >
+                    <Link href="/tournaments">Browse All</Link>
                   </Button>
                 </div>
 
@@ -435,7 +458,11 @@ export default function DashboardPage() {
                       <div className="text-xs text-slate-500 mt-1">62% complete</div>
                     </div>
 
-                    <Button size="sm" className="w-full bg-yellow-600 hover:bg-yellow-700 text-white">
+                    <Button
+                      size="sm"
+                      className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
+                      onClick={() => router.push('/tournaments')}
+                    >
                       🔥 Continue Playing
                     </Button>
                   </div>
@@ -477,7 +504,11 @@ export default function DashboardPage() {
                       <div className="text-xs text-slate-500 mt-1">867/1000 registered</div>
                     </div>
 
-                    <Button size="sm" className="w-full bg-orange-600 hover:bg-orange-700 text-white">
+                    <Button
+                      size="sm"
+                      className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                      onClick={() => router.push('/tournaments')}
+                    >
                       🎯 Join Tournament
                     </Button>
                   </div>
@@ -512,7 +543,12 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    <Button size="sm" className="w-full" variant="outline">
+                    <Button
+                      size="sm"
+                      className="w-full"
+                      variant="outline"
+                      onClick={() => router.push('/tournaments')}
+                    >
                       🗓️ Join Tournament
                     </Button>
                   </div>
@@ -552,7 +588,10 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-3 mb-4">
+                  <Button
+                    className="w-full bg-green-600 hover:bg-green-700 text-white py-3 mb-4"
+                    onClick={() => router.push('/challenge/daily')}
+                  >
                     🎯 Start Challenge
                   </Button>
                 </div>
@@ -569,7 +608,7 @@ export default function DashboardPage() {
                   <div className="mb-3">
                     <div className="text-sm text-slate-600 mb-2">Today's Leaders</div>
                     <div className="text-right mb-2">
-                      <Button variant="ghost" size="sm" className="text-xs text-blue-600 p-0">View All</Button>
+                      <Button variant="ghost" size="sm" className="text-xs text-blue-600 p-0" onClick={() => router.push('/challenge/daily')}>View All</Button>
                     </div>
                   </div>
 
@@ -762,9 +801,11 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                <Button variant="outline" className="w-full">
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  View Detailed Statistics
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href="/stats">
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    View Detailed Statistics
+                  </Link>
                 </Button>
               </div>
 
@@ -882,13 +923,17 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="flex gap-2 mt-4">
-                  <Button variant="outline" size="sm" className="flex-1 text-xs">
-                    <Eye className="w-3 h-3 mr-1" />
-                    View All
+                  <Button variant="outline" size="sm" className="flex-1 text-xs" asChild>
+                    <Link href="/friends">
+                      <Eye className="w-3 h-3 mr-1" />
+                      View All
+                    </Link>
                   </Button>
-                  <Button variant="outline" size="sm" className="flex-1 text-xs">
-                    <Plus className="w-3 h-3 mr-1" />
-                    Add Friend
+                  <Button variant="outline" size="sm" className="flex-1 text-xs" asChild>
+                    <Link href="/friends">
+                      <Plus className="w-3 h-3 mr-1" />
+                      Add Friend
+                    </Link>
                   </Button>
                 </div>
               </div>
