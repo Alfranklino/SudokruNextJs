@@ -166,7 +166,6 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
                   size="lg"
-                  onClick={handleStartGame}
                   className="
                     bg-blue-600 hover:bg-blue-700
                     text-white font-semibold
@@ -177,9 +176,12 @@ export default function HomePage() {
                     shadow-xl hover:shadow-2xl hover:shadow-blue-500/50
                     group
                   "
+                  asChild
                 >
-                  <Play className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-                  Start Playing Free
+                  <Link href="#try-now">
+                    <Play className="w-5 h-5 mr-2 group-hover:animate-pulse" />
+                    Start Playing Free
+                  </Link>
                 </Button>
                 <Button
                   size="lg"
@@ -196,7 +198,7 @@ export default function HomePage() {
                   "
                   asChild
                 >
-                  <Link href="#how-it-works">
+                  <Link href="/how-it-works">
                     <PlayCircle className="w-5 h-5 mr-2" />
                     How It Works
                   </Link>
@@ -293,7 +295,7 @@ export default function HomePage() {
       </section>
 
       {/* Live Playable Demo */}
-      <section className="py-16 bg-white">
+      <section id="try-now" className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-gray-900 mb-4">
