@@ -127,7 +127,7 @@ export default function HomePage() {
               Play Free Demo
             </Button>
             <Link href="/register">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              <Button size="lg" variant="outline" className="border-2 border-white text-white bg-white/10 hover:bg-white hover:text-blue-600">
                 Sign Up Free
               </Button>
             </Link>
@@ -378,7 +378,7 @@ export default function HomePage() {
               </Button>
             </Link>
             <Link href="/login">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              <Button size="lg" variant="outline" className="border-2 border-white text-white bg-white/10 hover:bg-white hover:text-gray-900">
                 Log In
               </Button>
             </Link>
