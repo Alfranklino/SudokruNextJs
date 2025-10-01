@@ -44,7 +44,9 @@
       "Bash(Stop-Process -Force)",
       "Bash(powershell:*)",
       "mcp__playwright__playwright_navigate",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git rm:*)",
+      "Bash(npm config get:*)"
     ],
     "deny": [],
     "ask": []
