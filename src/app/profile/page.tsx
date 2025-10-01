@@ -1,6 +1,7 @@
 'use client';
 
 import { MainLayout } from '@/components/layout';
+import { Breadcrumb } from '@/components/layout/Breadcrumb';
 import { Card } from '@/components/ui/card';
 import { User, Clock } from 'lucide-react';
 
@@ -9,6 +10,7 @@ export default function ProfilePage() {
     <MainLayout isAuthenticated={true}>
       <div className="min-h-screen bg-slate-50">
         <div className="max-w-7xl mx-auto p-6">
+          <Breadcrumb />
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-slate-900">Profile</h1>

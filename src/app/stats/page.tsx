@@ -1,12 +1,16 @@
 'use client';
 
+import { MainLayout } from '@/components/layout';
+import { Breadcrumb } from '@/components/layout/Breadcrumb';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BarChart3, Clock, Trophy, Target, TrendingUp, Star } from 'lucide-react';
 
 export default function StatsPage() {
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <MainLayout isAuthenticated={true}>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Breadcrumb />
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Statistics</h1>
         <p className="text-gray-600 mt-2">
@@ -183,6 +187,7 @@ export default function StatsPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </MainLayout>
   );
 }
