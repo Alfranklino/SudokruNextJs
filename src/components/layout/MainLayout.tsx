@@ -3,6 +3,7 @@
 import { ReactNode, useState } from 'react';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
+import { Footer } from './Footer';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -36,6 +37,8 @@ export function MainLayout({ children, className = '', isAuthenticated = true }:
         <main className="p-6">
           {children}
         </main>
+
+        <Footer />
       </div>
     </div>
   );

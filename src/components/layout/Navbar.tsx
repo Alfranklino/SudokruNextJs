@@ -57,8 +57,8 @@ export function Navbar({
 
   const visitorNavItems = [
     { href: '/', label: 'Home' },
-    { href: '#features', label: 'Features' },
-    { href: '#how-it-works', label: 'How It Works' },
+    { href: '/#features', label: 'Features' },
+    { href: '/how-it-works', label: 'How It Works' },
   ];
 
   const authenticatedNavItems = [
