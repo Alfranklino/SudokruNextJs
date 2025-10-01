@@ -2,7 +2,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 
-export function Footer() {
+interface FooterProps {
+  isAuthenticated?: boolean;
+}
+
+export function Footer({ isAuthenticated = false }: FooterProps) {
   return (
     <footer className="bg-slate-900 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -44,9 +48,9 @@ export function Footer() {
             <ul className="space-y-2">
               <li><Link href="/#features" className="text-gray-400 hover:text-white transition-colors text-sm">Features</Link></li>
               <li><Link href="/how-it-works" className="text-gray-400 hover:text-white transition-colors text-sm">How It Works</Link></li>
-              <li><Link href="/play-now" className="text-gray-400 hover:text-white transition-colors text-sm">Play Now</Link></li>
-              <li><Link href="/tournaments-preview" className="text-gray-400 hover:text-white transition-colors text-sm">Tournaments</Link></li>
-              <li><Link href="/leaderboards-preview" className="text-gray-400 hover:text-white transition-colors text-sm">Leaderboards</Link></li>
+              <li><Link href={isAuthenticated ? '/play/single' : '/play-now'} className="text-gray-400 hover:text-white transition-colors text-sm">Play Now</Link></li>
+              <li><Link href={isAuthenticated ? '/tournaments' : '/tournaments-preview'} className="text-gray-400 hover:text-white transition-colors text-sm">Tournaments</Link></li>
+              <li><Link href={isAuthenticated ? '/leaderboards' : '/leaderboards-preview'} className="text-gray-400 hover:text-white transition-colors text-sm">Leaderboards</Link></li>
             </ul>
           </div>
 

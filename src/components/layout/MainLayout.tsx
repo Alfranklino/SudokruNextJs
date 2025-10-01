@@ -38,7 +38,7 @@ export function MainLayout({ children, className = '', isAuthenticated = true }:
           {children}
         </main>
 
-        <Footer />
+        <Footer isAuthenticated={isAuthenticated} />
       </div>
     </div>
   );
