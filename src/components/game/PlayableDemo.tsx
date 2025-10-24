@@ -12,8 +12,6 @@ import { Play, Trophy, RotateCcw, Clock, TrendingUp, AlertCircle, Lightbulb, X }
 import { useSinglePlayerStore } from '@/stores/singlePlayerStore';
 import { DEFAULT_HIGHLIGHT_CONFIG } from '@/types/game-config';
 import type { Difficulty } from '@/lib/sudoku/difficulty';
-import { useFeatureFlag } from '@/hooks/useFeatureFlag';
-import { FEATURE_FLAGS } from '@/types/feature-flags';
 
 interface PlayableDemoProps {
   title?: string;
@@ -30,10 +28,25 @@ export function PlayableDemo({
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('easy');
 
   // Feature flag for unlimited hints for guests
-  const { isEnabled: unlimitedHintsEnabled, value: hintLimitValue } = useFeatureFlag(
-    FEATURE_FLAGS.UNLIMITED_HINTS_FOR_GUESTS,
-    { defaultValue: true }
-  );
+  const [unlimitedHintsEnabled, setUnlimitedHintsEnabled] = useState(false);
+
+  // Fetch flag from API on component mount
+  useEffect(() => {
+    const fetchFlag = async () => {
+      try {
+        const response = await fetch('/api/v1/flags');
+        const data = await response.json();
+        const flag = data.flags?.find((f: any) => f.key === 'unlimited-hints-guest');
+        if (flag) {
+          console.log('[PlayableDemo] Flag fetched:', flag.enabled);
+          setUnlimitedHintsEnabled(flag.enabled);
+        }
+      } catch (error) {
+        console.error('[PlayableDemo] Failed to fetch feature flag:', error);
+      }
+    };
+    fetchFlag();
+  }, []);
 
   const {
     gameStatus,
@@ -114,8 +127,8 @@ export function PlayableDemo({
   const handleUseHint = () => {
     // Check if hints are available based on feature flag
     if (!unlimitedHintsEnabled) {
-      // If unlimited hints disabled, check variant value for max hints
-      const maxHints = typeof hintLimitValue === 'number' ? hintLimitValue : 3;
+      // If unlimited hints disabled, limit to 3 hints
+      const maxHints = 3;
       if (hintCount >= maxHints) {
         alert(`You've reached your maximum of ${maxHints} hints. Sign up for unlimited hints!`);
         return;
@@ -229,9 +242,7 @@ export function PlayableDemo({
                   <Lightbulb className="w-4 h-4 text-purple-600" />
                   <span className="text-slate-600">Hints Used:</span>
                   <span className="font-semibold text-purple-600">
-                    {hintCount}
-                    {!unlimitedHintsEnabled && typeof hintLimitValue === 'number' && ` / ${hintLimitValue}`}
-                    {!unlimitedHintsEnabled && typeof hintLimitValue !== 'number' && ` / 3`}
+                    {hintCount}{!unlimitedHintsEnabled && ' / 3'}
                   </span>
                 </div>
               </div>
@@ -325,13 +336,11 @@ export function PlayableDemo({
                     className="border-purple-300 text-purple-600 hover:bg-purple-50"
                     disabled={
                       gameStatus !== 'playing' ||
-                      (!unlimitedHintsEnabled && hintCount >= (typeof hintLimitValue === 'number' ? hintLimitValue : 3))
+                      (!unlimitedHintsEnabled && hintCount >= 3)
                     }
                   >
                     <Lightbulb className="w-4 h-4 mr-2" />
-                    Get Hint
-                    {!unlimitedHintsEnabled && typeof hintLimitValue === 'number' && ` (${hintCount}/${hintLimitValue})`}
-                    {!unlimitedHintsEnabled && typeof hintLimitValue !== 'number' && ` (${hintCount}/3)`}
+                    Get Hint{!unlimitedHintsEnabled && ` (${hintCount}/3)`}
                   </Button>
                   <Button
                     onClick={handleStartGame}
