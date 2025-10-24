@@ -8,10 +8,12 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SudokuGrid } from '@/components/game/SudokuGrid';
 import { NumberTracker } from '@/components/game/NumberTracker';
-import { Play, Trophy, RotateCcw, Clock, TrendingUp, AlertCircle } from 'lucide-react';
+import { Play, Trophy, RotateCcw, Clock, TrendingUp, AlertCircle, Lightbulb, X } from 'lucide-react';
 import { useSinglePlayerStore } from '@/stores/singlePlayerStore';
 import { DEFAULT_HIGHLIGHT_CONFIG } from '@/types/game-config';
 import type { Difficulty } from '@/lib/sudoku/difficulty';
+
+const MAX_HINTS_VISITOR = 3; // Limit hints for non-authenticated users
 
 interface PlayableDemoProps {
   title?: string;
@@ -35,10 +37,15 @@ export function PlayableDemo({
     elapsedTime,
     moveCount,
     errorCount,
+    hintCount,
+    lastHint,
+    isTimerRunning,
     startNewGame,
     restartGame,
     makeMove,
     updateElapsedTime,
+    useHint,
+    clearLastHint,
   } = useSinglePlayerStore();
 
   // Trigger confetti on game completion
@@ -79,12 +86,38 @@ export function PlayableDemo({
     }
   }, [gameStatus]);
 
+  // Timer effect
+  useEffect(() => {
+    if (!isTimerRunning) return;
+
+    const interval = setInterval(() => {
+      updateElapsedTime(elapsedTime + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isTimerRunning, elapsedTime, updateElapsedTime]);
+
+  // Auto-dismiss hint after 8 seconds
+  useEffect(() => {
+    if (lastHint) {
+      const timer = setTimeout(() => {
+        clearLastHint();
+      }, 8000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [lastHint, clearLastHint]);
+
   const handleStartGame = () => {
     startNewGame(selectedDifficulty, 'unlimited');
   };
 
   const handleCellChange = (row: number, col: number, value: number) => {
     makeMove(row, col, value);
+  };
+
+  const handleUseHint = () => {
+    useHint();
   };
 
   const formatTime = (seconds: number): string => {
@@ -167,14 +200,17 @@ export function PlayableDemo({
                 </div>
               )}
 
+              {/* Timer Display */}
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Clock className="w-5 h-5 text-blue-600" />
+                <span className="text-2xl font-mono font-bold text-blue-600">
+                  {formatTime(elapsedTime)}
+                </span>
+                <span className="text-sm text-slate-500 ml-1">Elapsed</span>
+              </div>
+
               {/* Game Stats */}
               <div className="flex items-center justify-center gap-6 mb-6 text-sm flex-wrap">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-blue-600" />
-                  <span className="font-mono font-semibold text-slate-700">
-                    {formatTime(elapsedTime)}
-                  </span>
-                </div>
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-blue-600" />
                   <span className="text-slate-600">Moves:</span>
@@ -184,6 +220,11 @@ export function PlayableDemo({
                   <AlertCircle className="w-4 h-4 text-red-500" />
                   <span className="text-slate-600">Errors:</span>
                   <span className="font-semibold text-red-600">{errorCount}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4 text-purple-600" />
+                  <span className="text-slate-600">Hints:</span>
+                  <span className="font-semibold text-purple-600">{hintCount}/{MAX_HINTS_VISITOR}</span>
                 </div>
               </div>
 
@@ -210,28 +251,105 @@ export function PlayableDemo({
                 </div>
               )}
 
-              {/* Game Controls */}
-              <div className="flex gap-3 justify-center flex-wrap">
-                <Button
-                  onClick={restartGame}
-                  variant="outline"
-                >
-                  <RotateCcw className="w-4 h-4 mr-2" />
-                  Restart
-                </Button>
-                <Button
-                  onClick={handleStartGame}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <Play className="w-4 h-4 mr-2" />
-                  New Game
-                </Button>
-                {showSignUpPrompt && (
-                  <Link href="/register">
-                    <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
-                      Sign Up to Save Progress
-                    </Button>
-                  </Link>
+              {/* Hint Explanation Card */}
+              {lastHint && (
+                <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <Card className="bg-purple-50 border-purple-200 p-4 relative">
+                    <button
+                      onClick={clearLastHint}
+                      className="absolute top-2 right-2 text-purple-400 hover:text-purple-600 transition-colors"
+                      aria-label="Dismiss hint"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                    <div className="flex items-start gap-3 pr-6">
+                      <Lightbulb className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="font-semibold text-purple-900 mb-1">
+                          {lastHint.technique}
+                        </h4>
+                        <p className="text-sm text-purple-700 leading-relaxed">
+                          {lastHint.explanation}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              )}
+
+              {/* Inline Difficulty Selector & Game Controls */}
+              <div className="border-t pt-6 mt-6">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3 text-center">
+                  Start New Game
+                </h4>
+
+                {/* Difficulty Selector */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+                  {['easy', 'medium', 'hard', 'expert'].map((diff) => (
+                    <button
+                      key={diff}
+                      onClick={() => setSelectedDifficulty(diff as Difficulty)}
+                      className={`p-3 border-2 rounded-lg transition-all text-sm ${
+                        selectedDifficulty === diff
+                          ? 'border-blue-500 bg-blue-50 text-blue-900'
+                          : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                      }`}
+                    >
+                      <div className="font-semibold capitalize">{diff}</div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Game Control Buttons */}
+                <div className="flex gap-3 justify-center flex-wrap">
+                  <Button
+                    onClick={restartGame}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Restart
+                  </Button>
+                  <Button
+                    onClick={handleUseHint}
+                    variant="outline"
+                    size="sm"
+                    className="border-purple-300 text-purple-600 hover:bg-purple-50"
+                    disabled={gameStatus !== 'playing' || hintCount >= MAX_HINTS_VISITOR}
+                  >
+                    <Lightbulb className="w-4 h-4 mr-2" />
+                    Hint ({hintCount}/{MAX_HINTS_VISITOR})
+                  </Button>
+                  <Button
+                    onClick={handleStartGame}
+                    className="bg-blue-600 hover:bg-blue-700"
+                    size="sm"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    New Game ({selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1)})
+                  </Button>
+                </div>
+
+                {/* Hint Limit Message */}
+                {hintCount >= MAX_HINTS_VISITOR && showSignUpPrompt && (
+                  <div className="mt-4 text-center text-sm text-purple-600 bg-purple-50 py-2 px-4 rounded-lg">
+                    🎯 Hint limit reached!{' '}
+                    <Link href="/register" className="underline font-medium hover:text-purple-700">
+                      Sign up for unlimited hints
+                    </Link>
+                  </div>
+                )}
+
+                {/* Sign Up Prompt */}
+                {showSignUpPrompt && hintCount < MAX_HINTS_VISITOR && (
+                  <div className="mt-4 text-center">
+                    <div className="text-sm text-gray-500">
+                      Want to save your progress and get unlimited hints?{' '}
+                      <Link href="/register" className="text-blue-600 hover:underline font-medium">
+                        Create a free account
+                      </Link>
+                    </div>
+                  </div>
                 )}
               </div>
             </Card>

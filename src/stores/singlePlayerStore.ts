@@ -4,6 +4,8 @@ import { generatePuzzle } from '@/lib/sudoku/generator';
 import { isComplete, isValidMove, type Grid } from '@/lib/sudoku/validator';
 import { copyGrid } from '@/lib/sudoku/solver';
 import type { Difficulty } from '@/lib/sudoku/difficulty';
+import { findBestHint } from '@/lib/sudoku/techniques';
+import type { HintResult } from '@/types/hint';
 
 export type GameStatus = 'idle' | 'playing' | 'paused' | 'completed' | 'abandoned';
 export type TimerMode = 'unlimited' | 'timed';
@@ -36,6 +38,7 @@ interface SinglePlayerState {
   moveHistory: Move[];
   startedAt: Date | null;
   completedAt: Date | null;
+  lastHint: HintResult | null; // Store last hint for UI display
 
   // Actions
   startNewGame: (difficulty: Difficulty, timerMode: TimerMode, duration?: number) => void;
@@ -45,7 +48,8 @@ interface SinglePlayerState {
   restartGame: () => void;
   makeMove: (row: number, col: number, value: number) => boolean;
   undoMove: () => void;
-  useHint: () => boolean;
+  useHint: () => HintResult | null;
+  clearLastHint: () => void;
   checkCompletion: () => boolean;
   updateElapsedTime: (seconds: number) => void;
   autoFillSolution: () => void;
@@ -70,6 +74,7 @@ export const useSinglePlayerStore = create<SinglePlayerState>((set, get) => ({
   moveHistory: [],
   startedAt: null,
   completedAt: null,
+  lastHint: null,
 
   // Start a new game
   startNewGame: (difficulty: Difficulty, timerMode: TimerMode, duration?: number) => {
@@ -202,37 +207,26 @@ export const useSinglePlayerStore = create<SinglePlayerState>((set, get) => ({
     });
   },
 
-  // Use a hint
-  useHint: (): boolean => {
+  // Use a hint - now with intelligent technique-based selection
+  useHint: (): HintResult | null => {
     const { currentGrid, solution, initialGrid, gameStatus } = get();
 
-    if (!currentGrid || !solution || !initialGrid) return false;
-    if (gameStatus !== 'playing') return false;
+    if (!currentGrid || !solution || !initialGrid) return null;
+    if (gameStatus !== 'playing') return null;
 
-    // Find an empty cell that needs to be filled
-    const emptyCells: Array<{ row: number; col: number }> = [];
-    for (let row = 0; row < 9; row++) {
-      for (let col = 0; col < 9; col++) {
-        if (currentGrid[row][col] === 0 && initialGrid[row][col] === 0) {
-          emptyCells.push({ row, col });
-        }
-      }
-    }
+    // Find best hint using solving techniques
+    const hint = findBestHint(currentGrid, solution);
 
-    if (emptyCells.length === 0) return false;
+    if (!hint) return null;
 
-    // Pick a random empty cell
-    const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-    const { row, col } = randomCell;
-
-    // Fill it with the correct value
+    // Apply the hint to the grid
     const newGrid = copyGrid(currentGrid);
-    newGrid[row][col] = solution[row][col];
+    newGrid[hint.row][hint.col] = hint.value;
 
     const move: Move = {
-      row,
-      col,
-      value: solution[row][col],
+      row: hint.row,
+      col: hint.col,
+      value: hint.value,
       timestamp: Date.now(),
     };
 
@@ -241,12 +235,18 @@ export const useSinglePlayerStore = create<SinglePlayerState>((set, get) => ({
       hintCount: state.hintCount + 1,
       moveCount: state.moveCount + 1,
       moveHistory: [...state.moveHistory, move],
+      lastHint: hint,
     }));
 
     // Check if game is complete
     get().checkCompletion();
 
-    return true;
+    return hint;
+  },
+
+  // Clear last hint (for UI dismissal)
+  clearLastHint: () => {
+    set({ lastHint: null });
   },
 
   // Check if puzzle is complete
