@@ -78,10 +78,13 @@ export async function GET(request: NextRequest) {
     // }
 
     const searchParams = request.nextUrl.searchParams;
+    const enabledParam = searchParams.get('enabled');
+    const archivedParam = searchParams.get('archived');
+
     const query: FlagListQuery = {
       environment: searchParams.get('environment') as any,
-      enabled: searchParams.get('enabled') === 'true',
-      archived: searchParams.get('archived') === 'true',
+      enabled: enabledParam !== null ? enabledParam === 'true' : undefined,
+      archived: archivedParam !== null ? archivedParam === 'true' : undefined,
       search: searchParams.get('search') || undefined,
       page: parseInt(searchParams.get('page') || '1'),
       limit: parseInt(searchParams.get('limit') || '50'),

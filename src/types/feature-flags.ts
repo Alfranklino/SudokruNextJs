@@ -385,6 +385,7 @@ export const FEATURE_FLAGS = {
   // Game Features
   COLLABORATIVE_MODE: 'collaborative-mode',
   HINT_SYSTEM: 'hint-system',
+  UNLIMITED_HINTS_FOR_GUESTS: 'unlimited-hints-for-guests',
   PUZZLE_GENERATOR_V2: 'puzzle-generator-v2',
   REAL_TIME_MULTIPLAYER: 'real-time-multiplayer',
 
