@@ -1,0 +1,581 @@
+// Sudokru Database Schema
+// Feature Flag System + Core Application Models
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ================================
+// USER & AUTHENTICATION MODELS
+// ================================
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  username      String   @unique
+  displayName   String?
+  password      String
+  avatar        String?
+  bio           String?
+  country       String?
+  eloRating     Int      @default(1200)
+  peakRating    Int      @default(1200)
+  subscription  SubscriptionTier @default(FREE)
+  role          UserRole @default(USER)
+  isVerified    Boolean  @default(false)
+  isBanned      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastActiveAt  DateTime @default(now())
+
+  // Relationships
+  games              GamePlayer[]
+  tournaments        TournamentParticipant[]
+  friendsInitiated   Friendship[] @relation("FriendshipInitiator")
+  friendsReceived    Friendship[] @relation("FriendshipReceiver")
+  notifications      Notification[]
+  sessions           Session[]
+  preferences        UserPreference?
+  statistics         UserStatistics?
+  achievements       UserAchievement[]
+  flagOverrides      FeatureFlagOverride[]
+  flagAuditLogs      FeatureFlagAudit[]
+
+  @@index([username])
+  @@index([email])
+  @@index([eloRating])
+  @@index([subscription])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  token        String   @unique
+  refreshToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model UserPreference {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  preferredDifficulty Difficulty @default(MEDIUM)
+  soundEnabled        Boolean  @default(true)
+  animationsEnabled   Boolean  @default(true)
+  profileVisibility   Visibility @default(PUBLIC)
+  emailNotifications  Boolean  @default(true)
+  pushNotifications   Boolean  @default(true)
+  theme               String   @default("system")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserStatistics {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  gamesPlayed       Int      @default(0)
+  gamesWon          Int      @default(0)
+  gamesLost         Int      @default(0)
+  currentStreak     Int      @default(0)
+  longestStreak     Int      @default(0)
+  totalPlayTime     Int      @default(0) // seconds
+  averageSolveTime  Int      @default(0) // seconds
+  bestSolveTime     Int?     // seconds
+  totalMoves        Int      @default(0)
+  totalErrors       Int      @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserAchievement {
+  id          String   @id @default(cuid())
+  userId      String
+  achievementKey String
+  unlockedAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementKey])
+  @@index([userId])
+}
+
+// ================================
+// GAME MODELS
+// ================================
+
+model Game {
+  id            String     @id @default(cuid())
+  type          GameType
+  mode          GameMode   @default(CASUAL)
+  difficulty    Difficulty
+  status        GameStatus @default(WAITING)
+  puzzleId      String
+  maxPlayers    Int        @default(2)
+  timeLimit     Int?       // seconds
+  isPrivate     Boolean    @default(false)
+  inviteCode    String?    @unique
+  createdAt     DateTime   @default(now())
+  startedAt     DateTime?
+  completedAt   DateTime?
+
+  // Relationships
+  puzzle        SudokuPuzzle @relation(fields: [puzzleId], references: [id])
+  players       GamePlayer[]
+  moves         GameMove[]
+  chatMessages  ChatMessage[]
+
+  @@index([status])
+  @@index([difficulty])
+  @@index([createdAt])
+}
+
+model SudokuPuzzle {
+  id            String     @id @default(cuid())
+  difficulty    Difficulty
+  initialGrid   String     // JSON array 9x9
+  solutionGrid  String     // JSON array 9x9
+  clueCount     Int
+  rating        Int        @default(0)
+  playCount     Int        @default(0)
+  createdAt     DateTime   @default(now())
+
+  games Game[]
+
+  @@index([difficulty])
+  @@index([rating])
+}
+
+model GamePlayer {
+  id              String     @id @default(cuid())
+  gameId          String
+  userId          String
+  role            PlayerRole @default(PLAYER)
+  status          PlayerStatus @default(JOINED)
+  currentGrid     String?    // JSON array 9x9
+  moveCount       Int        @default(0)
+  errorCount      Int        @default(0)
+  hintsUsed       Int        @default(0)
+  completionTime  Int?       // seconds
+  score           Int        @default(0)
+  isWinner        Boolean    @default(false)
+  joinedAt        DateTime   @default(now())
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([gameId, userId])
+  @@index([gameId])
+  @@index([userId])
+}
+
+model GameMove {
+  id            String   @id @default(cuid())
+  gameId        String
+  userId        String
+  row           Int
+  col           Int
+  value         Int
+  moveType      MoveType @default(PLACE)
+  isCorrect     Boolean
+  timeFromStart Int      // milliseconds
+  timestamp     DateTime @default(now())
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@index([gameId])
+  @@index([userId])
+  @@index([timestamp])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  gameId    String
+  userId    String
+  username  String
+  message   String
+  timestamp DateTime @default(now())
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@index([gameId])
+  @@index([timestamp])
+}
+
+// ================================
+// TOURNAMENT MODELS
+// ================================
+
+model Tournament {
+  id                String           @id @default(cuid())
+  name              String
+  description       String?
+  format            TournamentFormat
+  status            TournamentStatus @default(UPCOMING)
+  difficulty        Difficulty
+  maxPlayers        Int
+  currentPlayers    Int              @default(0)
+  timeLimit         Int              // seconds per game
+  minRating         Int?
+  maxRating         Int?
+  entryFee          Int              @default(0) // cents
+  prizePool         Int              @default(0) // cents
+  isPremiumOnly     Boolean          @default(false)
+  currentRound      Int              @default(0)
+  totalRounds       Int
+  registrationStart DateTime
+  registrationEnd   DateTime
+  startTime         DateTime
+  endTime           DateTime?
+  createdAt         DateTime         @default(now())
+
+  participants TournamentParticipant[]
+  matches      TournamentMatch[]
+
+  @@index([status])
+  @@index([startTime])
+}
+
+model TournamentParticipant {
+  id             String   @id @default(cuid())
+  tournamentId   String
+  userId         String
+  seedPosition   Int?
+  currentRound   Int      @default(0)
+  isEliminated   Boolean  @default(false)
+  finalPosition  Int?
+  ratingAtEntry  Int
+  registeredAt   DateTime @default(now())
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tournamentId, userId])
+  @@index([tournamentId])
+  @@index([userId])
+}
+
+model TournamentMatch {
+  id           String       @id @default(cuid())
+  tournamentId String
+  round        Int
+  matchNumber  Int
+  player1Id    String?
+  player2Id    String?
+  winnerId     String?
+  gameId       String?
+  status       MatchStatus  @default(UPCOMING)
+  scheduledAt  DateTime?
+  startedAt    DateTime?
+  completedAt  DateTime?
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+
+  @@unique([tournamentId, round, matchNumber])
+  @@index([tournamentId])
+  @@index([status])
+}
+
+// ================================
+// SOCIAL MODELS
+// ================================
+
+model Friendship {
+  id          String           @id @default(cuid())
+  requesterId String
+  addresseeId String
+  status      FriendshipStatus @default(PENDING)
+  message     String?
+  createdAt   DateTime         @default(now())
+  acceptedAt  DateTime?
+
+  requester User @relation("FriendshipInitiator", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee User @relation("FriendshipReceiver", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+  @@index([requesterId])
+  @@index([addresseeId])
+  @@index([status])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  data      String?          // JSON additional data
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+// ================================
+// FEATURE FLAG MODELS
+// ================================
+
+model FeatureFlag {
+  id              String   @id @default(cuid())
+  key             String   @unique
+  name            String
+  description     String?
+  enabled         Boolean  @default(false)
+  defaultValue    Boolean  @default(false)
+  flagType        FlagType @default(BOOLEAN)
+  environment     Environment @default(ALL)
+  rolloutPercent  Int      @default(0) // 0-100
+  createdBy       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  archivedAt      DateTime?
+
+  // Relationships
+  rules           FeatureFlagRule[]
+  overrides       FeatureFlagOverride[]
+  auditLogs       FeatureFlagAudit[]
+  variants        FeatureFlagVariant[]
+
+  @@index([key])
+  @@index([enabled])
+  @@index([environment])
+}
+
+model FeatureFlagRule {
+  id            String   @id @default(cuid())
+  flagId        String
+  name          String
+  ruleType      RuleType
+  operator      RuleOperator
+  value         String   // JSON value for comparison
+  priority      Int      @default(0)
+  enabled       Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  flag FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
+
+  @@index([flagId])
+  @@index([priority])
+}
+
+model FeatureFlagOverride {
+  id        String   @id @default(cuid())
+  flagId    String
+  userId    String
+  value     Boolean
+  reason    String?
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+
+  flag FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([flagId, userId])
+  @@index([flagId])
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model FeatureFlagVariant {
+  id          String   @id @default(cuid())
+  flagId      String
+  key         String
+  name        String
+  description String?
+  value       String   // JSON value
+  weight      Int      @default(0) // 0-100 for percentage distribution
+  createdAt   DateTime @default(now())
+
+  flag FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
+
+  @@unique([flagId, key])
+  @@index([flagId])
+}
+
+model FeatureFlagAudit {
+  id          String   @id @default(cuid())
+  flagId      String
+  userId      String?
+  action      FlagAction
+  changes     String?  // JSON diff of changes
+  previousValue String?
+  newValue      String?
+  ipAddress   String?
+  userAgent   String?
+  timestamp   DateTime @default(now())
+
+  flag FeatureFlag @relation(fields: [flagId], references: [id], onDelete: Cascade)
+  user User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([flagId])
+  @@index([userId])
+  @@index([timestamp])
+}
+
+// ================================
+// ENUMS
+// ================================
+
+enum SubscriptionTier {
+  FREE
+  PREMIUM
+}
+
+enum UserRole {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum Visibility {
+  PUBLIC
+  FRIENDS
+  PRIVATE
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+  EXPERT
+}
+
+enum GameType {
+  COMPETITIVE
+  COLLABORATIVE
+  TOURNAMENT
+  PRACTICE
+}
+
+enum GameMode {
+  SPEED
+  ACCURACY
+  CASUAL
+}
+
+enum GameStatus {
+  WAITING
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ABANDONED
+}
+
+enum PlayerRole {
+  PLAYER
+  SPECTATOR
+}
+
+enum PlayerStatus {
+  JOINED
+  READY
+  PLAYING
+  COMPLETED
+  DISCONNECTED
+}
+
+enum MoveType {
+  PLACE
+  CLEAR
+  NOTE
+}
+
+enum TournamentFormat {
+  SINGLE_ELIMINATION
+  DOUBLE_ELIMINATION
+  ROUND_ROBIN
+}
+
+enum TournamentStatus {
+  UPCOMING
+  REGISTRATION
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum MatchStatus {
+  UPCOMING
+  ACTIVE
+  COMPLETED
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
+}
+
+enum NotificationType {
+  FRIEND_REQUEST
+  GAME_INVITE
+  TOURNAMENT_START
+  ACHIEVEMENT
+  SYSTEM
+}
+
+enum FlagType {
+  BOOLEAN
+  STRING
+  NUMBER
+  JSON
+}
+
+enum Environment {
+  DEVELOPMENT
+  STAGING
+  PRODUCTION
+  ALL
+}
+
+enum RuleType {
+  USER_ID
+  USER_SEGMENT
+  ELO_RATING
+  SUBSCRIPTION_TIER
+  COUNTRY
+  DEVICE_TYPE
+  USER_ROLE
+  CUSTOM
+}
+
+enum RuleOperator {
+  EQUALS
+  NOT_EQUALS
+  IN
+  NOT_IN
+  GREATER_THAN
+  LESS_THAN
+  GREATER_THAN_OR_EQUAL
+  LESS_THAN_OR_EQUAL
+  CONTAINS
+  STARTS_WITH
+  ENDS_WITH
+}
+
+enum FlagAction {
+  CREATED
+  UPDATED
+  ENABLED
+  DISABLED
+  ARCHIVED
+  RULE_ADDED
+  RULE_UPDATED
+  RULE_REMOVED
+  OVERRIDE_ADDED
+  OVERRIDE_REMOVED
+}
