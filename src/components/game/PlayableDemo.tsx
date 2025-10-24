@@ -13,7 +13,8 @@ import { useSinglePlayerStore } from '@/stores/singlePlayerStore';
 import { DEFAULT_HIGHLIGHT_CONFIG } from '@/types/game-config';
 import type { Difficulty } from '@/lib/sudoku/difficulty';
 
-const MAX_HINTS_VISITOR = 3; // Limit hints for non-authenticated users
+// Note: Hint limit will be database-driven in future (user settings)
+const UNLIMITED_HINTS = true; // For now, provide unlimited hints
 
 interface PlayableDemoProps {
   title?: string;
@@ -96,17 +97,6 @@ export function PlayableDemo({
 
     return () => clearInterval(interval);
   }, [isTimerRunning, elapsedTime, updateElapsedTime]);
-
-  // Auto-dismiss hint after 8 seconds
-  useEffect(() => {
-    if (lastHint) {
-      const timer = setTimeout(() => {
-        clearLastHint();
-      }, 8000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [lastHint, clearLastHint]);
 
   const handleStartGame = () => {
     startNewGame(selectedDifficulty, 'unlimited');
@@ -223,8 +213,8 @@ export function PlayableDemo({
                 </div>
                 <div className="flex items-center gap-2">
                   <Lightbulb className="w-4 h-4 text-purple-600" />
-                  <span className="text-slate-600">Hints:</span>
-                  <span className="font-semibold text-purple-600">{hintCount}/{MAX_HINTS_VISITOR}</span>
+                  <span className="text-slate-600">Hints Used:</span>
+                  <span className="font-semibold text-purple-600">{hintCount}</span>
                 </div>
               </div>
 
@@ -315,10 +305,10 @@ export function PlayableDemo({
                     variant="outline"
                     size="sm"
                     className="border-purple-300 text-purple-600 hover:bg-purple-50"
-                    disabled={gameStatus !== 'playing' || hintCount >= MAX_HINTS_VISITOR}
+                    disabled={gameStatus !== 'playing'}
                   >
                     <Lightbulb className="w-4 h-4 mr-2" />
-                    Hint ({hintCount}/{MAX_HINTS_VISITOR})
+                    Get Hint
                   </Button>
                   <Button
                     onClick={handleStartGame}
@@ -330,21 +320,11 @@ export function PlayableDemo({
                   </Button>
                 </div>
 
-                {/* Hint Limit Message */}
-                {hintCount >= MAX_HINTS_VISITOR && showSignUpPrompt && (
-                  <div className="mt-4 text-center text-sm text-purple-600 bg-purple-50 py-2 px-4 rounded-lg">
-                    🎯 Hint limit reached!{' '}
-                    <Link href="/register" className="underline font-medium hover:text-purple-700">
-                      Sign up for unlimited hints
-                    </Link>
-                  </div>
-                )}
-
                 {/* Sign Up Prompt */}
-                {showSignUpPrompt && hintCount < MAX_HINTS_VISITOR && (
+                {showSignUpPrompt && (
                   <div className="mt-4 text-center">
                     <div className="text-sm text-gray-500">
-                      Want to save your progress and get unlimited hints?{' '}
+                      Want to save your progress and track stats?{' '}
                       <Link href="/register" className="text-blue-600 hover:underline font-medium">
                         Create a free account
                       </Link>
