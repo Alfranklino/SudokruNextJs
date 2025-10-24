@@ -46,7 +46,10 @@
       "mcp__playwright__playwright_navigate",
       "Bash(curl:*)",
       "Bash(git rm:*)",
-      "Bash(npm config get:*)"
+      "Bash(npm config get:*)",
+      "SlashCommand(/restart)",
+      "SlashCommand(/inspect / \"hero section dark theme, navbar scroll effect light to dark transition, animated sudoku grid with GSAP showing errors and correct values, confetti celebration contained within hero, CTA buttons optimized for conversion, responsive design mobile tablet desktop, social proof elements, feature highlights\")",
+      "SlashCommand(/inspect:*)"
     ],
     "deny": [],
     "ask": []
