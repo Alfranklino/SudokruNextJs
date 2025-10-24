@@ -32,9 +32,27 @@ docs/
 ├── design/          # Style guide, Figma prompts, components
 ├── technical/       # API spec, database schema, architecture
 └── user-experience/ # User journeys, flows
+
+.claude/
+├── commands/        # Custom slash commands
+└── todos/           # Task tracking and next steps for features
 ```
 
 See `docs/development/sudokru_folder_structure.md` for complete project structure.
+
+### Task Tracking
+**Location**: `.claude/todos/`
+
+**Purpose**: Track next steps, remaining work, and decisions for major features
+
+**Usage**:
+- Each major feature has its own markdown file (e.g., `feature-flags.md`)
+- Documents completed tasks, remaining work, priorities, and recommendations
+- Updated as work progresses
+- Reference before continuing work on a feature
+
+**Current todos**:
+- `feature-flags.md` - Feature flag system next steps (6/10 tasks complete)
 
 ## Critical Rules
 
